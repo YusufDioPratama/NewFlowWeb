@@ -1,0 +1,2285 @@
+<!DOCTYPE html>
+<html lang="id" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistem Armada & Docking — Maritime Operational Console</title>
+  
+  <!-- Fonts: Plus Jakarta Sans (Headings & UI), Inter (Body), JetBrains Mono (Technical Codes) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#F0FDFA',
+              100: '#CCFBF1',
+              200: '#99F6E4',
+              500: '#14B8A6',
+              600: '#0D9488',
+              700: '#087F78', // Primary Nautical Teal
+              800: '#115E59',
+              900: '#134E4A',
+            },
+            deep: {
+              800: '#1E293B',
+              900: '#0F172A',
+              950: '#090D16',
+            },
+            soft: {
+              bg: '#F8FAFC',
+              card: '#FFFFFF',
+              border: '#E2E8F0',
+              borderHover: '#CBD5E1',
+              muted: '#64748B',
+            }
+          },
+          boxShadow: {
+            'subtle': '0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 1px 2px -1px rgba(15, 23, 42, 0.03)',
+            'card': '0 4px 6px -1px rgba(15, 23, 42, 0.05), 0 2px 4px -2px rgba(15, 23, 42, 0.03)',
+            'float': '0 10px 25px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.03)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #F8FAFC;
+      color: #0F172A;
+      font-family: 'Inter', sans-serif;
+    }
+    .font-num {
+      font-variant-numeric: tabular-nums;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    /* Soft Custom Scrollbar */
+    .custom-scroll::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 9999px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: #F1F5F9;
+    }
+    /* Interactive Step Node Pulse */
+    @keyframes pulseStep {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(13, 148, 136, 0.4); }
+      50% { transform: scale(1.05); box-shadow: 0 0 0 6px rgba(13, 148, 136, 0); }
+    }
+    .pulse-active {
+      animation: pulseStep 2s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-brand-100 selection:text-brand-900 antialiased">
+
+  <!-- ================= TOP HEADER NAVIGATION ================= -->
+  <header class="bg-deep-900 border-b border-slate-800 text-white sticky top-0 z-40 shadow-card">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      
+      <!-- Logo & Brand Identity -->
+      <div class="flex items-center space-x-3.5">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-700 to-brand-500 flex items-center justify-center text-white shadow-inner font-bold text-lg">
+          <i class="fa-solid fa-ship"></i>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="font-display font-extrabold text-base tracking-tight text-white">SISTEM ARMADA & DOCKING</span>
+            <span class="text-[10px] font-mono bg-deep-800 text-brand-200 border border-slate-700 px-2 py-0.5 rounded font-semibold">SOP TF.02</span>
+          </div>
+          <div class="text-[11px] text-slate-400 flex items-center space-x-1.5">
+            <span>Maritime Fleet Console</span>
+            <span class="text-slate-600">•</span>
+            <span class="text-emerald-400 font-mono text-[10px] flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1 animate-pulse"></span>Live DB</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Role Switcher Bar (Interactive testing anywhere without login barrier) -->
+      <div class="flex items-center space-x-2 sm:space-x-4">
+        
+        <!-- Role Dropdown Selector -->
+        <div class="relative flex items-center">
+          <div class="flex items-center space-x-2 bg-deep-800/90 border border-slate-700 hover:border-brand-500 rounded-xl px-3 py-1.5 transition">
+            <div id="topRoleAvatar" class="w-6 h-6 rounded-lg bg-brand-700 text-white flex items-center justify-center text-xs">
+              <i class="fa-solid fa-user"></i>
+            </div>
+            <div class="text-left">
+              <div class="text-[9px] font-mono uppercase text-slate-400 leading-none">Role Aktif</div>
+              <select id="selectGlobalRole" onchange="switchRole(this.value)" class="bg-transparent text-xs font-bold text-white focus:outline-none cursor-pointer pr-4 font-display">
+                <option value="OMA_ADMIN" class="bg-deep-900 text-white">OMA / Admin Utama</option>
+                <option value="OMA_2" class="bg-deep-900 text-white">OMA 2 / Pendamping</option>
+                <option value="JR_TS" class="bg-deep-900 text-white">Jr TS (Junior Supt)</option>
+                <option value="SR_TS" class="bg-deep-900 text-white">Sr TS (Senior Supt)</option>
+                <option value="MRP" class="bg-deep-900 text-white">MRP (Material/Stock)</option>
+                <option value="WORKSHOP" class="bg-deep-900 text-white">Workshop (Fasilitas)</option>
+                <option value="REGIONAL" class="bg-deep-900 text-white">Regional (Pengadaan PBJ)</option>
+                <option value="KAPAL" class="bg-deep-900 text-white">Kapal (Nakhoda/KKM)</option>
+                <option value="KEUANGAN" class="bg-deep-900 text-white">Keuangan (Kas/Payment)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Task Notification Pill -->
+        <button id="topTaskNotice" onclick="switchTab('tasks')" class="hidden sm:inline-flex items-center space-x-1.5 text-xs bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-3 py-2 rounded-xl transition shadow-sm">
+          <i class="fa-solid fa-bell"></i>
+          <span id="topTaskCount">0</span>
+          <span>Tugas</span>
+        </button>
+
+        <!-- Sync Button -->
+        <button onclick="syncSmartsheet()" id="btnSyncTop" class="inline-flex items-center space-x-1.5 text-xs text-slate-300 hover:text-white bg-deep-800 hover:bg-slate-700 border border-slate-700 px-3 py-2 rounded-xl transition" title="Sinkronkan data dari adapter Smartsheet">
+          <i class="fa-solid fa-arrows-rotate text-brand-500"></i>
+          <span class="hidden md:inline">Sync Data</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Secondary Workspace Subnav Tabs -->
+    <div class="bg-deep-950/80 border-t border-slate-800/80 px-4 sm:px-6">
+      <div class="max-w-7xl mx-auto flex overflow-x-auto space-x-1.5 py-1.5 custom-scroll" id="tabbar">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= MAIN APP VIEWPORT ================= -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
+
+    <!-- ================= TAB 1: DASHBOARD RINGKASAN ================= -->
+    <section id="sec-dashboard" class="tab-sec space-y-6">
+      
+      <!-- Top Welcome & Metric Highlights -->
+      <div class="bg-gradient-to-r from-deep-900 via-deep-800 to-brand-900 text-white rounded-2xl p-6 shadow-card border border-slate-800 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        <div class="space-y-1.5">
+          <div class="flex items-center space-x-2 text-xs font-mono text-brand-200">
+            <span class="w-2 h-2 rounded-full bg-brand-500"></span>
+            <span>INTEGRATED FLEET COMMAND &amp; DOCKING AUDIT</span>
+          </div>
+          <h1 class="text-2xl sm:text-3xl font-extrabold font-display tracking-tight text-white">
+            Konsol Manajemen Armada &amp; Pengedokan
+          </h1>
+          <p class="text-xs text-slate-300 max-w-2xl leading-relaxed">
+            Pemantauan siklus pemeliharaan kapal sesuai SOP B.TMT.5.4.01-TF, kontrol pagu anggaran RKA, ketersediaan material suku cadang, dan audit serah terima BAST.
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+          <div class="bg-white/10 backdrop-blur-md border border-white/10 rounded-xl p-3 text-center min-w-[120px]">
+            <div class="text-[10px] font-mono text-slate-300 uppercase">Status Sistem</div>
+            <div class="text-sm font-bold text-emerald-300 mt-0.5 flex items-center justify-center">
+              <i class="fa-solid fa-circle-check mr-1.5 text-xs"></i>Normal
+            </div>
+            <div class="text-[9px] text-slate-400 mt-0.5">SOP Enforced</div>
+          </div>
+          <div class="bg-white/10 backdrop-blur-md border border-white/10 rounded-xl p-3 text-center min-w-[120px]">
+            <div class="text-[10px] font-mono text-slate-300 uppercase">Tugas Anda (<span id="quickRoleLabel">JR_TS</span>)</div>
+            <div class="text-lg font-bold font-num text-amber-300 mt-0.5" id="dashMyTaskCount">0</div>
+            <button onclick="switchTab('tasks')" class="text-[10px] text-brand-200 hover:text-white underline mt-0.5 block mx-auto">
+              Buka Kotak Tugas
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6 Key Information Stat Cards -->
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3.5" id="kpiStatsContainer">
+        <!-- Rendered by JS -->
+      </div>
+
+      <!-- INTERACTIVE PIPELINE FLOW RADAR (Click any stage to filter!) -->
+      <div class="bg-white border border-soft-border rounded-2xl p-5 shadow-subtle space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <div class="text-[10px] font-mono text-brand-700 uppercase font-semibold">Live Operational Radar</div>
+            <h3 class="text-base font-bold font-display text-deep-900 flex items-center space-x-2">
+              <i class="fa-solid fa-diagram-project text-brand-600"></i>
+              <span>Pipeline Status Alur Kerja (Klik untuk Memfilter)</span>
+            </h3>
+          </div>
+          <div class="flex items-center space-x-2 text-xs">
+            <button onclick="filterPipelineStage('')" class="text-xs px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold transition">
+              Reset Filter
+            </button>
+            <span class="text-slate-400 font-mono text-[11px]" id="dashStageFilterActive">Menampilkan Semua</span>
+          </div>
+        </div>
+
+        <!-- 7-Stage Horizontal Progress Cards -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5 pt-1" id="dashPipelineCards">
+          <!-- Injected by JS -->
+        </div>
+      </div>
+
+      <!-- 2-Column Split: Fleet Grid + Live Activity Feed -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- Left Column: Vessel Fleet Monitoring (8 Cols) -->
+        <div class="lg:col-span-8 space-y-4">
+          <div class="bg-white border border-soft-border rounded-2xl p-5 shadow-subtle space-y-4">
+            <div class="flex items-center justify-between border-b border-soft-border pb-3">
+              <div class="flex items-center space-x-2.5">
+                <div class="w-8 h-8 rounded-lg bg-brand-50 text-brand-700 flex items-center justify-center text-sm font-bold">
+                  <i class="fa-solid fa-compass"></i>
+                </div>
+                <div>
+                  <h3 class="text-sm font-bold font-display text-deep-900">Kesiapan Armada &amp; Telemetri Noon Report</h3>
+                  <p class="text-xs text-soft-muted">Data terintegrasi dari Smartsheet untuk jam kerja mesin (RH) &amp; pelabuhan singgah.</p>
+                </div>
+              </div>
+              <button onclick="switchTab('master')" class="text-xs text-brand-700 hover:text-brand-900 font-semibold flex items-center space-x-1">
+                <span>Lihat Master Data</span>
+                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+              </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5" id="dashFleetGrid">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+
+          <!-- Active Work Order Table -->
+          <div class="bg-white border border-soft-border rounded-2xl p-5 shadow-subtle space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-soft-border pb-3">
+              <div class="flex items-center space-x-2.5">
+                <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-700 flex items-center justify-center text-sm font-bold">
+                  <i class="fa-solid fa-list-check"></i>
+                </div>
+                <div>
+                  <h3 class="text-sm font-bold font-display text-deep-900">Daftar Pekerjaan Berjalan</h3>
+                  <p class="text-xs text-soft-muted">Work Order aktif di seluruh armada dan status approval-nya.</p>
+                </div>
+              </div>
+
+              <!-- Segment filter -->
+              <div class="flex items-center space-x-2">
+                <select id="dashOrderSegSelect" onchange="renderDashboardOrders()" class="text-xs bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 text-slate-700 font-medium focus:outline-none">
+                  <option value="">Semua Segmentasi</option>
+                  <option value="DOCKING">Docking</option>
+                  <option value="RUNNING_REPAIR">Running Repair</option>
+                  <option value="FLOATING">Floating</option>
+                  <option value="SWAKELOLA">Swakelola</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto custom-scroll">
+              <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr class="bg-slate-50 text-slate-600 font-semibold border-b border-soft-border">
+                    <th class="py-2.5 px-3">KAPAL</th>
+                    <th class="py-2.5 px-3">PEKERJAAN &amp; SUMBER</th>
+                    <th class="py-2.5 px-3">SEGMENTASI</th>
+                    <th class="py-2.5 px-3">STATUS</th>
+                    <th class="py-2.5 px-3 text-right">AKSI</th>
+                  </tr>
+                </thead>
+                <tbody id="dashOrdersTbody" class="divide-y divide-soft-border">
+                  <!-- Rendered by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Current Role Console & Live Activity Feed (4 Cols) -->
+        <div class="lg:col-span-4 space-y-4">
+          
+          <!-- Role Authorization Card -->
+          <div class="bg-gradient-to-br from-deep-900 to-deep-800 text-white rounded-2xl p-5 shadow-card border border-slate-800 space-y-3">
+            <div class="flex items-center space-x-3">
+              <div id="dashRoleIconBox" class="w-10 h-10 rounded-xl bg-brand-700 text-white flex items-center justify-center text-lg font-bold shadow-inner">
+                <i class="fa-solid fa-user-check"></i>
+              </div>
+              <div>
+                <div class="text-[10px] font-mono text-brand-200 uppercase tracking-wider">Peran Anda Saat Ini</div>
+                <div class="text-base font-bold font-display" id="dashRoleTitle">JR_TS</div>
+              </div>
+            </div>
+            
+            <p class="text-xs text-slate-300 leading-relaxed" id="dashRoleDesc">Deskripsi peran...</p>
+
+            <div class="pt-2 border-t border-slate-700/80">
+              <div class="text-[11px] font-semibold text-slate-300 mb-1.5 flex items-center">
+                <i class="fa-solid fa-shield-halved text-brand-500 mr-1.5"></i>
+                <span>Wewenang Otorisasi Khusus:</span>
+              </div>
+              <ul class="text-[11px] text-slate-300 space-y-1" id="dashRoleRights">
+                <!-- Rendered by JS -->
+              </ul>
+            </div>
+
+            <div class="pt-2">
+              <button onclick="switchTab('tasks')" class="w-full py-2.5 bg-brand-700 hover:bg-brand-600 text-white font-bold text-xs rounded-xl transition text-center shadow-sm flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-inbox"></i>
+                <span>Buka Tugas Saya (<span id="dashRoleTaskCountBadge">0</span>)</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Real-time Activity Feed -->
+          <div class="bg-white border border-soft-border rounded-2xl p-5 shadow-subtle space-y-3">
+            <div class="flex items-center justify-between border-b border-soft-border pb-2.5">
+              <h3 class="text-sm font-bold font-display text-deep-900 flex items-center space-x-2">
+                <i class="fa-solid fa-clock-rotate-left text-brand-600"></i>
+                <span>Log Jejak Audit Real-time</span>
+              </h3>
+              <span class="text-[10px] font-mono text-slate-400 bg-slate-100 px-2 py-0.5 rounded">Live Audit</span>
+            </div>
+            <div class="space-y-3 custom-scroll max-h-[380px] overflow-y-auto pr-1" id="dashAuditFeed">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ================= TAB 2: KOTAK TUGAS SAYA ================= -->
+    <section id="sec-tasks" class="tab-sec hidden space-y-5">
+      <div class="bg-white border border-soft-border rounded-2xl p-5 shadow-subtle flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div class="text-[10px] font-mono text-brand-700 uppercase font-semibold">Tugas Sesuai Kewenangan</div>
+          <h2 class="text-xl font-bold font-display text-deep-900 flex items-center space-x-2">
+            <i class="fa-solid fa-inbox text-brand-600"></i>
+            <span>Kotak Tugas: <span id="taskSectionRoleLabel">JR_TS</span></span>
+          </h2>
+          <p class="text-xs text-soft-muted mt-0.5">Hanya menampilkan order yang membutuhkan verifikasi, alokasi, eksekusi, atau persetujuan dari peran Anda.</p>
+        </div>
+        <div class="flex items-center space-x-3">
+          <span class="text-xs font-mono font-semibold bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg border border-slate-200" id="taskCountDetail">0 item</span>
+          <button onclick="loadAll()" class="text-xs bg-brand-700 hover:bg-brand-800 text-white font-semibold px-3.5 py-2 rounded-xl transition shadow-sm flex items-center space-x-1.5">
+            <i class="fa-solid fa-arrows-rotate"></i>
+            <span>Refresh</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Task List Container -->
+      <div id="tasksContainer" class="space-y-3.5">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- ================= TAB 3: INPUT TEMUAN & BUAT WO ================= -->
+    <section id="sec-create" class="tab-sec hidden space-y-5">
+      <div class="bg-white border border-soft-border rounded-2xl p-5 shadow-subtle space-y-1">
+        <div class="text-[10px] font-mono text-brand-700 uppercase font-semibold">Formulir Perekaman Temuan</div>
+        <h2 class="text-xl font-bold font-display text-deep-900 flex items-center space-x-2">
+          <i class="fa-solid fa-circle-plus text-brand-600"></i>
+          <span>Perekaman Temuan (Defect List) &amp; Penerbitan Work Order</span>
+        </h2>
+        <p class="text-xs text-soft-muted max-w-3xl leading-relaxed">
+          Berdasarkan ERD, temuan kerusakan dapat bersumber dari Audit NC, jadwal PMS, rencana CAP, Unplanned Breakdown kapal, maupun Rencana Docking Tahunan.
+        </p>
+      </div>
+
+      <form id="formNewOrder" onsubmit="submitNewOrder(event)" class="bg-white border border-soft-border rounded-2xl p-6 shadow-subtle space-y-5 text-xs">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-slate-700 font-semibold mb-1">Pilih Kapal Armada (Fleet ID) *</label>
+            <select id="inputFleetId" required class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-deep-900 font-medium focus:border-brand-600 focus:outline-none"></select>
+          </div>
+
+          <div>
+            <label class="block text-slate-700 font-semibold mb-1">Sumber Temuan (Defect Source) *</label>
+            <select id="inputSumber" required class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-deep-900 font-medium focus:border-brand-600 focus:outline-none">
+              <option value="PMS">PMS (Preventive Maintenance System)</option>
+              <option value="AUDIT_NC">Audit NC (Ketidaksesuaian BKI/Internal)</option>
+              <option value="CAP">CAP (Condition Assessment Program)</option>
+              <option value="UNPLANNED">Unplanned Breakdown (Darurat Kapal)</option>
+              <option value="DOCKING_PLAN">Rencana Docking Rutin</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-slate-700 font-semibold mb-1">Tingkat Prioritas *</label>
+            <select id="inputPriority" required class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-deep-900 font-medium focus:border-brand-600 focus:outline-none">
+              <option value="LOW">Low (Pemeliharaan Ringan)</option>
+              <option value="MEDIUM" selected>Medium (Jadwal Operasional Normal)</option>
+              <option value="HIGH">High (Mendesak / Gangguan Kelaiklautan)</option>
+              <option value="EMERGENCY">Emergency (Stop Operasi Segera)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-slate-700 font-semibold mb-1">Segmentasi Pekerjaan *</label>
+            <select id="inputSegmentasi" onchange="toggleDockingFields(this.value)" required class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-deep-900 font-medium focus:border-brand-600 focus:outline-none">
+              <option value="DOCKING" selected>DOCKING (Pengedokan Galangan)</option>
+              <option value="RUNNING_REPAIR">RUNNING REPAIR (Perbaikan saat Operasi)</option>
+              <option value="FLOATING">FLOATING (Perbaikan di Dermaga Sandar)</option>
+              <option value="SWAKELOLA">SWAKELOLA (Pekerjaan Mandiri Awak Kapal)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-slate-700 font-semibold mb-1">Nama / Uraian Utama Pekerjaan *</label>
+            <input id="inputPekerjaan" required type="text" placeholder="Contoh: Overhaul Pompa Ballast &amp; Penggantian Seal Stern Tube" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-deep-900 focus:border-brand-600 focus:outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-700 font-semibold mb-1">Deskripsi Detail Temuan &amp; Spesifikasi Teknis *</label>
+          <textarea id="inputDeskripsi" required rows="3" placeholder="Uraikan kondisi visual, hasil pengukuran getaran/thickness, foto kerusakan, dan rekomendasi penanganan..." class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-deep-900 focus:border-brand-600 focus:outline-none"></textarea>
+        </div>
+
+        <!-- Extra Docking Parameters -->
+        <div id="dockingExtraFields" class="p-4 bg-brand-50/70 border border-brand-200 rounded-xl space-y-3">
+          <div class="text-xs font-bold text-brand-900 flex items-center space-x-1.5">
+            <i class="fa-solid fa-anchor"></i>
+            <span>Parameter Khusus Pekerjaan Docking (SOP B.TMT.5.4.01-TF)</span>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-slate-700 font-semibold mb-1">Target Durasi Pengedokan (Hari)</label>
+              <input id="inputTargetDays" type="number" min="1" value="14" class="w-full bg-white border border-brand-300 rounded-xl p-2 text-deep-900 font-num">
+            </div>
+            <div>
+              <label class="block text-slate-700 font-semibold mb-1">Pagu RKA Docking (Rp) *</label>
+              <input id="inputRkaPagu" type="number" min="0" step="1000000" value="500000000" class="w-full bg-white border border-brand-300 rounded-xl p-2 text-deep-900 font-num">
+              <span class="text-[10px] text-slate-500 mt-1 block">Rujukan resmi untuk penentuan Gate Addendum >10% OMA / Direktur Teknik.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end space-x-3 pt-3 border-t border-soft-border">
+          <button type="reset" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl transition">
+            Reset Form
+          </button>
+          <button type="submit" class="px-5 py-2.5 bg-brand-700 hover:bg-brand-800 text-white font-bold rounded-xl shadow-sm transition flex items-center space-x-1.5">
+            <i class="fa-solid fa-paper-plane"></i>
+            <span>Terbitkan Work Order (Status: DRAFT)</span>
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ================= TAB 4: MODUL DOCKING (SOP & 4 MILESTONES) ================= -->
+    <section id="sec-docking" class="tab-sec hidden space-y-5">
+      <div class="bg-white border border-soft-border rounded-2xl p-5 shadow-subtle flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div class="text-[10px] font-mono text-brand-700 uppercase font-semibold">Pengendalian Pengedokan</div>
+          <h2 class="text-xl font-bold font-display text-deep-900 flex items-center space-x-2">
+            <i class="fa-solid fa-anchor text-brand-600"></i>
+            <span>Modul Docking &amp; Pelaksanaan 4 Berita Acara SOP</span>
+          </h2>
+          <p class="text-xs text-soft-muted mt-0.5">Monitoring hari pengedokan, pencatatan 4 milestone BA, otorisasi pekerjaan tambahan (addendum), dan pengesahan BAST.</p>
+        </div>
+      </div>
+
+      <div id="dockingContainer" class="space-y-4">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- ================= TAB 5: PIPELINE GLOBAL & AUDIT TRAIL ================= -->
+    <section id="sec-pipeline" class="tab-sec hidden space-y-5">
+      <div class="bg-white border border-soft-border rounded-2xl p-5 shadow-subtle space-y-3">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div>
+            <div class="text-[10px] font-mono text-brand-700 uppercase font-semibold">Sentralisasi Database Laporan</div>
+            <h2 class="text-xl font-bold font-display text-deep-900">Audit Seluruh Siklus Work Order</h2>
+            <p class="text-xs text-soft-muted">Pemantauan menyeluruh seluruh pesanan kerja armada dari draf hingga pengarsipan akhir.</p>
+          </div>
+
+          <!-- Search & Filter Controls -->
+          <div class="flex flex-wrap items-center gap-2">
+            <input type="text" id="pipelineSearchInput" oninput="renderPipeline()" placeholder="Cari kapal / pekerjaan..." class="text-xs bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-deep-900 focus:outline-none">
+            <select id="pipelineStatusFilter" onchange="renderPipeline()" class="text-xs bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-deep-900 focus:outline-none font-medium">
+              <option value="">Semua Status</option>
+              <option value="DRAFT">Draft</option>
+              <option value="SUBMITTED_JR_TS">Menunggu Sr TS</option>
+              <option value="APPROVED_SR_TS">Disetujui Sr TS</option>
+              <option value="MRP_STOCK_CHECK">Cek Stock MRP</option>
+              <option value="ALLOCATED_WORKSHOP">Workshop</option>
+              <option value="REGIONAL_COST_ESTIMATE">Cost Estimate</option>
+              <option value="REGIONAL_PR_PBJ">Pengadaan PBJ</option>
+              <option value="EXECUTION">Eksekusi</option>
+              <option value="WORK_COMPLETED">Selesai Fisik</option>
+              <option value="BAST_SUBMITTED">BAST Terbit</option>
+              <option value="PAYMENT_PROCESSED">Pembayaran Diproses</option>
+              <option value="COMPLETED">Selesai / Diarsipkan</option>
+              <option value="REJECTED">Ditolak</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div id="pipelineContainer" class="space-y-3">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- ================= TAB 6: MASTER DATA ARMADA ================= -->
+    <section id="sec-master" class="tab-sec hidden space-y-5">
+      <div class="bg-white border border-soft-border rounded-2xl p-5 shadow-subtle flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div class="text-[10px] font-mono text-brand-700 uppercase font-semibold">Asset Repository</div>
+          <h2 class="text-xl font-bold font-display text-deep-900 flex items-center space-x-2">
+            <i class="fa-solid fa-database text-brand-600"></i>
+            <span>Master Data Kapal Armada &amp; Noon Report</span>
+          </h2>
+          <p class="text-xs text-soft-muted mt-0.5">Spesifikasi teknis, sertifikat kelaiklautan, peralatan mekanis, dan laporan harian kapal dari Smartsheet.</p>
+        </div>
+        <button onclick="syncSmartsheet()" class="text-xs font-semibold bg-brand-700 hover:bg-brand-800 text-white px-3.5 py-2 rounded-xl flex items-center space-x-1.5 shadow-sm transition">
+          <i class="fa-solid fa-arrows-rotate"></i>
+          <span>Sinkronkan Ulang Smartsheet</span>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="fleetCardsContainer">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- ================= TAB 7: PMS & RUNNING HOURS ================= -->
+    <section id="sec-pms" class="tab-sec hidden space-y-5">
+      <div class="bg-white border border-soft-border rounded-2xl p-5 shadow-subtle space-y-1">
+        <div class="text-[10px] font-mono text-brand-700 uppercase font-semibold">Preventive Maintenance System</div>
+        <h2 class="text-xl font-bold font-display text-deep-900 flex items-center space-x-2">
+          <i class="fa-solid fa-gauge-high text-brand-600"></i>
+          <span>Jadwal Perawatan PMS &amp; Jam Kerja Mesin (Running Hours)</span>
+        </h2>
+        <p class="text-xs text-soft-muted">Integrasi jam operasional mesin per unit kapal dari Smartsheet untuk pencegahan breakdown dini.</p>
+      </div>
+
+      <div class="bg-white border border-soft-border rounded-2xl overflow-hidden shadow-subtle">
+        <div class="overflow-x-auto custom-scroll">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="bg-slate-50 text-slate-700 font-semibold border-b border-soft-border">
+                <th class="p-3">KAPAL</th>
+                <th class="p-3">ITEM PEKERJAAN PMS</th>
+                <th class="p-3">RUNNING HOURS AKTUAL</th>
+                <th class="p-3">INTERVAL PERAWATAN</th>
+                <th class="p-3">JATUH TEMPO</th>
+                <th class="p-3">STATUS</th>
+              </tr>
+            </thead>
+            <tbody id="pmsTableBody" class="divide-y divide-soft-border">
+              <!-- Rendered by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= TAB 8: PANDUAN ALUR & APPROVAL MATRIX ================= -->
+    <section id="sec-guide" class="tab-sec hidden space-y-6">
+      
+      <!-- Section Header -->
+      <div class="bg-white border border-soft-border rounded-2xl p-5 shadow-subtle space-y-1">
+        <div class="text-[10px] font-mono text-brand-700 uppercase font-semibold">Arsitektur Alur &amp; Otorisasi SOP</div>
+        <h2 class="text-xl font-bold font-display text-deep-900 flex items-center space-x-2">
+          <i class="fa-solid fa-route text-brand-600"></i>
+          <span>Diagram Alur Kerja Interaktif &amp; Matriks Approval</span>
+        </h2>
+        <p class="text-xs text-soft-muted leading-relaxed max-w-3xl">
+          Alur kerja dirancang 100% selaras dengan ERD sistem armada dan SOP Prosedur Docking Kapal (B.TMT.5.4.01-TF). Klik setiap langkah di bawah untuk melihat rincian kewenangan peran, dokumen yang dipersyaratkan, serta aturan pintu gerbang (Gate Rules).
+        </p>
+      </div>
+
+      <!-- 7-Stage Interactive Visual Stepper -->
+      <div class="bg-white border border-soft-border rounded-2xl p-5 shadow-subtle space-y-4">
+        <h3 class="text-sm font-bold font-display text-deep-900 flex items-center space-x-2">
+          <i class="fa-solid fa-network-wired text-brand-600"></i>
+          <span>7 Tahapan Siklus Hidup Pekerjaan (End-to-End)</span>
+        </h3>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-2.5" id="flowStepsGrid">
+          <!-- Rendered by JS -->
+        </div>
+
+        <!-- Detail Box for Clicked Step -->
+        <div id="stepDetailBox" class="p-4 bg-brand-50/80 border border-brand-200 rounded-xl space-y-2 text-xs">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+
+      <!-- 4 Key SOP Gates Callouts -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <!-- Gate 1: Addendum > 10% -->
+        <div class="bg-white border-l-4 border-l-amber-500 border border-soft-border rounded-2xl p-4 shadow-subtle space-y-2">
+          <div class="flex items-center space-x-2 text-amber-700 font-bold text-xs">
+            <i class="fa-solid fa-scale-balanced"></i>
+            <span>GATE ADDENDUM &gt;10%</span>
+          </div>
+          <h4 class="text-xs font-bold text-deep-900">Batas Otorisasi Dirtek / OMA</h4>
+          <p class="text-[11px] text-slate-600 leading-relaxed">
+            Jika kumulatif pekerjaan tambahan &le;10% pagu RKA, persetujuan cukup oleh <strong>Sr TS</strong>. Jika &gt;10% pagu RKA, sistem secara ketat mewajibkan otorisasi <strong>Direktur Teknik / OMA</strong>.
+          </p>
+        </div>
+
+        <!-- Gate 2: 4 Berita Acara SOP -->
+        <div class="bg-white border-l-4 border-l-brand-600 border border-soft-border rounded-2xl p-4 shadow-subtle space-y-2">
+          <div class="flex items-center space-x-2 text-brand-700 font-bold text-xs">
+            <i class="fa-solid fa-file-shield"></i>
+            <span>4 MILESTONE BERITA ACARA</span>
+          </div>
+          <h4 class="text-xs font-bold text-deep-900">Validasi Fisik Pengedokan</h4>
+          <p class="text-[11px] text-slate-600 leading-relaxed">
+            Selama status <strong>EXECUTION</strong>, pengawas lapangan wajib mencatat 4 BA formal: <em>Joint Survey, Naik Dok, Turun Dok,</em> dan <em>Sea Trial</em> berlampiran berkas sebelum pekerjaan diselesaikan.
+          </p>
+        </div>
+
+        <!-- Gate 3: BAST Gate -->
+        <div class="bg-white border-l-4 border-l-purple-600 border border-soft-border rounded-2xl p-4 shadow-subtle space-y-2">
+          <div class="flex items-center space-x-2 text-purple-700 font-bold text-xs">
+            <i class="fa-solid fa-stamp"></i>
+            <span>GATE BAST &amp; MUTU</span>
+          </div>
+          <h4 class="text-xs font-bold text-deep-900">Syarat Pengesahan Serah Terima</h4>
+          <p class="text-[11px] text-slate-600 leading-relaxed">
+            BAST hanya dapat diterbitkan setelah pekerjaan berstatus <strong>WORK_COMPLETED</strong>. Wajib melampirkan skor evaluasi galangan (0-100), berkas BAST resmi, dan foto dokumentasi fisik.
+          </p>
+        </div>
+
+        <!-- Gate 4: Keuangan & Kunci Pembukuan -->
+        <div class="bg-white border-l-4 border-l-emerald-600 border border-soft-border rounded-2xl p-4 shadow-subtle space-y-2">
+          <div class="flex items-center space-x-2 text-emerald-700 font-bold text-xs">
+            <i class="fa-solid fa-lock"></i>
+            <span>KUNCI KAS &amp; PEMBUKUAN</span>
+          </div>
+          <h4 class="text-xs font-bold text-deep-900">Sinkronisasi Keuangan</h4>
+          <p class="text-[11px] text-slate-600 leading-relaxed">
+            Konfirmasi status <strong>PAYMENT_PROCESSED</strong> oleh Keuangan otomatis mengunci BAST ke status <span class="text-emerald-700 font-bold">PAID</span> sebelum diarsipkan oleh OMA.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Backend Transition Matrix Table -->
+      <div class="bg-white border border-soft-border rounded-2xl p-5 shadow-subtle space-y-3">
+        <div class="border-b border-soft-border pb-3">
+          <h3 class="text-sm font-bold font-display text-deep-900 flex items-center space-x-2">
+            <i class="fa-solid fa-table-list text-brand-600"></i>
+            <span>Matriks Aturan Transisi Status Lengkap (Backend RBAC Matrix)</span>
+          </h3>
+          <p class="text-xs text-soft-muted">Aturan transisi ini divalidasi langsung oleh WorkflowService di server.</p>
+        </div>
+
+        <div class="overflow-x-auto custom-scroll">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="bg-slate-50 text-slate-700 font-semibold border-b border-soft-border">
+                <th class="py-2.5 px-3">DARI STATUS</th>
+                <th class="py-2.5 px-3">KE STATUS TARGET</th>
+                <th class="py-2.5 px-3">ROLE YANG BERHAK</th>
+                <th class="py-2.5 px-3">CATATAN PINTU GERBANG (SOP RULE)</th>
+              </tr>
+            </thead>
+            <tbody id="matrixBody" class="divide-y divide-soft-border">
+              <!-- Rendered by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="mt-auto border-t border-soft-border bg-white py-4 px-6 text-xs text-soft-muted font-mono">
+    <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-2">
+      <div class="flex items-center space-x-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+        <span>SISTEM INFORMASI LOGISTIK MARITIM INDONESIA (ARMADA &amp; DOCKING)</span>
+      </div>
+      <div class="flex space-x-4">
+        <span>SOP B.TMT.5.4.01-TF</span>
+        <span>BKI Class Verified</span>
+        <span>Port 3000</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ================= MODAL: WORK ORDER DETAIL INSPECTOR ================= -->
+  <div id="modalDetail" class="fixed inset-0 bg-deep-950/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-300 rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col shadow-float">
+      <div class="bg-slate-50 border-b border-soft-border px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-8 h-8 rounded-lg bg-brand-700 text-white flex items-center justify-center text-xs font-bold">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold font-display text-deep-900">Rincian Lengkap Work Order &amp; Riwayat Audit</h3>
+            <div class="text-[11px] text-soft-muted font-mono" id="detailModalSubtitle">ID: -</div>
+          </div>
+        </div>
+        <button onclick="closeModal('modalDetail')" class="text-slate-400 hover:text-deep-900 text-lg transition">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="p-6 overflow-y-auto custom-scroll space-y-5 text-xs" id="detailModalBody">
+        <!-- Rendered by JS -->
+      </div>
+
+      <div class="bg-slate-50 border-t border-soft-border px-6 py-3 flex justify-end">
+        <button onclick="closeModal('modalDetail')" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold text-xs rounded-xl transition">
+          Tutup Rincian
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: GENERIC TRANSITION ================= -->
+  <div id="modalTransition" class="fixed inset-0 bg-deep-950/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-300 rounded-2xl w-full max-w-md p-6 space-y-4 shadow-float">
+      <div class="flex justify-between items-center border-b border-soft-border pb-3">
+        <h3 class="text-sm font-bold font-display text-deep-900 flex items-center space-x-2">
+          <i class="fa-solid fa-forward text-brand-600"></i>
+          <span id="transTitle">Tindak Lanjut Alur</span>
+        </h3>
+        <button onclick="closeModal('modalTransition')" class="text-slate-400 hover:text-deep-900">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form id="formTransition" onsubmit="submitTransition(event)" class="space-y-4 text-xs">
+        <input type="hidden" id="transOrderId">
+        <input type="hidden" id="transToStatus">
+        
+        <div class="bg-brand-50/70 border border-brand-200 rounded-xl p-3 text-slate-700" id="transSummary"></div>
+        
+        <div>
+          <label class="block text-slate-700 font-semibold mb-1">Catatan / Keterangan Otorisasi <span class="text-slate-400 font-normal">(Opsional)</span></label>
+          <textarea id="transNotes" rows="3" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-deep-900 focus:border-brand-600 focus:outline-none" placeholder="Contoh: Diverifikasi sesuai hasil inspeksi visual. Tim galangan siap bekerja."></textarea>
+        </div>
+
+        <div class="flex justify-end space-x-2 pt-2">
+          <button type="button" onclick="closeModal('modalTransition')" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 font-semibold">Batal</button>
+          <button type="submit" class="px-5 py-2 bg-brand-700 hover:bg-brand-800 text-white font-bold rounded-xl shadow-sm">Konfirmasi Otorisasi</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: ADDENDUM REQUEST ================= -->
+  <div id="modalAddendum" class="fixed inset-0 bg-deep-950/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-300 rounded-2xl w-full max-w-md p-6 space-y-4 shadow-float">
+      <div class="flex justify-between items-center border-b border-soft-border pb-3">
+        <h3 class="text-sm font-bold font-display text-deep-900 flex items-center space-x-2">
+          <i class="fa-solid fa-file-circle-plus text-amber-600"></i>
+          <span>Pengajuan Addendum Pekerjaan Tambahan</span>
+        </h3>
+        <button onclick="closeModal('modalAddendum')" class="text-slate-400 hover:text-deep-900">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form id="formAddendum" onsubmit="submitAddendum(event)" class="space-y-4 text-xs">
+        <input type="hidden" id="addendumDockingId">
+        
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-slate-700" id="addendumSummary"></div>
+        
+        <div>
+          <label class="block text-slate-700 font-semibold mb-1">Uraian Pekerjaan Tambahan *</label>
+          <textarea id="addendumUraian" required rows="2" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-deep-900 focus:border-amber-600 focus:outline-none" placeholder="Contoh: Penggantian pelat lambung lajur B akibat korosi pitting pasca sandblasting"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-slate-700 font-semibold mb-1">Estimasi Biaya Tambahan (Rp) *</label>
+          <input id="addendumBiaya" oninput="calcAddendumPct(this.value)" required type="number" min="1" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-deep-900 font-num focus:border-amber-600 focus:outline-none" placeholder="Contoh: 45000000">
+          
+          <div id="addendumWarningBadge" class="mt-2 hidden p-2.5 rounded-xl text-[11px] font-semibold"></div>
+        </div>
+
+        <div class="flex justify-end space-x-2 pt-2">
+          <button type="button" onclick="closeModal('modalAddendum')" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 font-semibold">Batal</button>
+          <button type="submit" class="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl shadow-sm">Ajukan Addendum</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: MILESTONE BERITA ACARA ================= -->
+  <div id="modalMilestone" class="fixed inset-0 bg-deep-950/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-300 rounded-2xl w-full max-w-md p-6 space-y-4 shadow-float">
+      <div class="flex justify-between items-center border-b border-soft-border pb-3">
+        <h3 class="text-sm font-bold font-display text-deep-900 flex items-center space-x-2">
+          <i class="fa-solid fa-file-signature text-brand-600"></i>
+          <span>Pencatatan Milestone Berita Acara SOP</span>
+        </h3>
+        <button onclick="closeModal('modalMilestone')" class="text-slate-400 hover:text-deep-900">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form id="formMilestone" onsubmit="submitMilestone(event)" class="space-y-4 text-xs">
+        <input type="hidden" id="milestoneDockingId">
+        
+        <div>
+          <label class="block text-slate-700 font-semibold mb-1">Jenis Berita Acara (Tahapan SOP) *</label>
+          <select id="milestoneTipe" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-deep-900 focus:border-brand-600 focus:outline-none font-medium">
+            <option value="JOINT_SURVEY">BA Joint Survey &amp; Penentuan Scope Awal (TF.00.03)</option>
+            <option value="NAIK_DOK">BA Naik Dok / Kapal Duduk di Balok (TF.02.07)</option>
+            <option value="TURUN_DOK">BA Turun Dok / Peluncuran Kapal (TF.02.08)</option>
+            <option value="SEA_TRIAL">BA Uji Coba Berlayar / Sea Trial (TF.02.10)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-slate-700 font-semibold mb-1">URL / Path Dokumen Berita Acara</label>
+          <input id="milestoneDocUrl" type="text" value="/uploads/ba_berita_acara.pdf" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-deep-900 font-mono">
+        </div>
+
+        <div class="flex justify-end space-x-2 pt-2">
+          <button type="button" onclick="closeModal('modalMilestone')" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 font-semibold">Batal</button>
+          <button type="submit" class="px-5 py-2 bg-brand-700 hover:bg-brand-800 text-white font-bold rounded-xl shadow-sm">Simpan Berita Acara</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: BAST + SCORING ================= -->
+  <div id="modalBast" class="fixed inset-0 bg-deep-950/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-300 rounded-2xl w-full max-w-lg p-6 space-y-4 shadow-float">
+      <div class="flex justify-between items-center border-b border-soft-border pb-3">
+        <h3 class="text-sm font-bold font-display text-deep-900 flex items-center space-x-2">
+          <i class="fa-solid fa-stamp text-purple-700"></i>
+          <span>Pengesahan BAST &amp; Evaluasi Kinerja Galangan</span>
+        </h3>
+        <button onclick="closeModal('modalBast')" class="text-slate-400 hover:text-deep-900">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form id="formBast" onsubmit="submitBast(event)" class="space-y-4 text-xs">
+        <input type="hidden" id="bastOrderId">
+        
+        <div class="bg-purple-50 border border-purple-200 rounded-xl p-3 text-slate-700" id="bastSummary"></div>
+        
+        <div>
+          <div class="flex justify-between items-center mb-1">
+            <label class="text-slate-700 font-semibold">Skor Evaluasi Kinerja Galangan (0 - 100) *</label>
+            <span id="bastScoreValue" class="font-mono font-bold text-purple-700 text-base">90.0</span>
+          </div>
+          <input id="bastScore" oninput="document.getElementById('bastScoreValue').innerText = parseFloat(this.value).toFixed(1)" required type="range" min="50" max="100" step="0.5" value="90" class="w-full accent-purple-700 cursor-pointer">
+          <div class="flex justify-between text-[10px] text-slate-400 font-mono">
+            <span>50 (Cukup)</span>
+            <span>75 (Baik)</span>
+            <span>90+ (Sangat Memuaskan)</span>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-700 font-semibold mb-1">Catatan Evaluasi / Rekomendasi Hasil Pekerjaan</label>
+          <textarea id="bastCatatan" rows="2" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-deep-900 focus:border-purple-700 focus:outline-none" placeholder="Contoh: Pekerjaan rampung tepat waktu, kualitas cat dan pengelasan rapi, lulus uji sea trial tanpa catatan kritis."></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-700 font-semibold mb-1">Berkas Dokumen BAST Resmi</label>
+            <input id="bastDocUrl" type="text" value="/uploads/bast_final_sah.pdf" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2 text-deep-900 font-mono text-[11px]">
+          </div>
+          <div>
+            <label class="block text-slate-700 font-semibold mb-1">Dokumentasi Foto Fisik</label>
+            <input id="bastFotoUrl" type="text" value="/uploads/foto_selesai_dock.jpg" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2 text-deep-900 font-mono text-[11px]">
+          </div>
+        </div>
+
+        <div class="flex justify-end space-x-2 pt-2">
+          <button type="button" onclick="closeModal('modalBast')" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 font-semibold">Batal</button>
+          <button type="submit" class="px-5 py-2 bg-purple-700 hover:bg-purple-800 text-white font-bold rounded-xl shadow-sm">Sahkan BAST &amp; Kirim ke Keuangan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: ADDENDUM DECISION ================= -->
+  <div id="modalAddendumDecision" class="fixed inset-0 bg-deep-950/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-300 rounded-2xl w-full max-w-md p-6 space-y-4 shadow-float">
+      <div class="flex justify-between items-center border-b border-soft-border pb-3">
+        <h3 class="text-sm font-bold font-display text-deep-900 flex items-center space-x-2" id="addDecisionTitle">
+          <i class="fa-solid fa-gavel text-amber-600"></i>
+          <span>Keputusan Addendum</span>
+        </h3>
+        <button onclick="closeModal('modalAddendumDecision')" class="text-slate-400 hover:text-deep-900">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form id="formAddDecision" onsubmit="submitAddDecision(event)" class="space-y-4 text-xs">
+        <input type="hidden" id="addDecisionId">
+        <input type="hidden" id="addDecisionAction">
+        
+        <div class="bg-slate-50 border border-slate-300 rounded-xl p-3 text-slate-700" id="addDecisionSummary"></div>
+        
+        <div>
+          <label class="block text-slate-700 font-semibold mb-1">Catatan Pertimbangan Keputusan</label>
+          <textarea id="addDecisionNotes" rows="2" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-deep-900 focus:outline-none" placeholder="Contoh: Disetujui mengacu pada hasil pengujian ketebalan plat lajur B oleh BKI."></textarea>
+        </div>
+
+        <div class="flex justify-end space-x-2 pt-2">
+          <button type="button" onclick="closeModal('modalAddendumDecision')" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 font-semibold">Batal</button>
+          <button type="submit" id="addDecisionSubmit" class="px-5 py-2 text-white font-bold rounded-xl shadow-sm">Konfirmasi Keputusan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= JAVASCRIPT APPLICATION CODE ================= -->
+  <script>
+    // ================= ROLE DEFINITIONS =================
+    const ROLE_META = {
+      OMA_ADMIN: {
+        icon: 'fa-user-tie', color: 'rose', label: 'OMA / Admin Utama',
+        badgeClass: 'bg-rose-50 text-rose-700 border-rose-200',
+        desc: 'Pemegang sentral seluruh data & alur kerja. Otorisasi puncak level Direktur Teknik.',
+        rights: ['Akses seluruh master data', 'Approval darurat transisi', 'Otorisasi addendum >10% RKA', 'Arsip & pembukuan akhir']
+      },
+      OMA_2: {
+        icon: 'fa-user-tie', color: 'rose', label: 'OMA 2 / Pendamping',
+        badgeClass: 'bg-rose-50 text-rose-700 border-rose-200',
+        desc: 'Pengawas operasional dan pendamping administratif OMA utama.',
+        rights: ['Monitoring pipeline global', 'Supervisi data Smartsheet', 'Otorisasi addendum >10% RKA']
+      },
+      JR_TS: {
+        icon: 'fa-user-gear', color: 'blue', label: 'Jr TS (Junior Supt)',
+        badgeClass: 'bg-blue-50 text-blue-700 border-blue-200',
+        desc: 'Pengelola teknis harian lapangan: pelaporan temuan, pelaksanaan, dan penyerahan.',
+        rights: ['Pencatatan Defect & WO', 'Pengajuan ke Sr TS', 'Catat 4 BA docking', 'Pengajuan addendum', 'Upload BAST & skor']
+      },
+      SR_TS: {
+        icon: 'fa-user-check', color: 'amber', label: 'Sr TS (Senior Supt)',
+        badgeClass: 'bg-amber-50 text-amber-800 border-amber-200',
+        desc: 'Persetujuan teknis spesifikasi, evaluasi draf pekerjaan, dan gatekeeper addendum.',
+        rights: ['Persetujuan / Penolakan WO', 'Approve addendum ≤10% RKA', 'Pemeriksaan milestone docking', 'Pernyataan pekerjaan selesai']
+      },
+      MRP: {
+        icon: 'fa-boxes-stacked', color: 'emerald', label: 'MRP (Material & Stock)',
+        badgeClass: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+        desc: 'Pemeriksaan stok material gudang dan penentuan rute pelaksanaan perbaikan.',
+        rights: ['Cek ketersediaan suku cadang', 'Alokasi ke Workshop (Stok Ada)', 'Eskalasi ke Regional (Pengadaan)']
+      },
+      WORKSHOP: {
+        icon: 'fa-screwdriver-wrench', color: 'purple', label: 'Workshop (Fasilitas)',
+        badgeClass: 'bg-purple-50 text-purple-700 border-purple-200',
+        desc: 'Pelaksana perbaikan mandiri menggunakan fasilitas bengkel internal perusahaan.',
+        rights: ['Penerimaan pekerjaan', 'Pelaksanaan eksekusi fisik', 'Pernyataan pekerjaan selesai']
+      },
+      REGIONAL: {
+        icon: 'fa-building-columns', color: 'cyan', label: 'Regional (Pengadaan PBJ)',
+        badgeClass: 'bg-cyan-50 text-cyan-800 border-cyan-200',
+        desc: 'Estimasi biaya eksternal, pembuatan Purchase Requisition (PR), dan tender PBJ galangan.',
+        rights: ['Cost estimation pekerjaan', 'Penerbitan PR pengadaan', 'Penetapan galangan rekanan', 'Pelaksanaan & monitoring PBJ']
+      },
+      KAPAL: {
+        icon: 'fa-ship', color: 'teal', label: 'Kapal (Nakhoda/KKM)',
+        badgeClass: 'bg-teal-50 text-teal-800 border-teal-200',
+        desc: 'Personel di atas kapal: pelaporan kerusakan awal dan pengesahan serah terima.',
+        rights: ['Laporan temuan (Audit/PMS/Breakdown)', 'Pengajuan draf pekerjaan', 'Pengesahan akhir BAST bersama Jr TS']
+      },
+      KEUANGAN: {
+        icon: 'fa-money-bill-wave', color: 'indigo', label: 'Keuangan (Kas/Payment)',
+        badgeClass: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+        desc: 'Pemeriksaan dokumen BAST, pemrosesan pembayaran galangan, dan penutupan kas.',
+        rights: ['Verifikasi tagihan & BAST', 'Otorisasi pembayaran invoice', 'Penguncian status PAID']
+      }
+    };
+
+    // ================= TRANSITIONS (Mirroring Server Workflow) =================
+    const TRANSITIONS = {
+      DRAFT: { SUBMITTED_JR_TS: ['JR_TS','KAPAL'] },
+      SUBMITTED_JR_TS: { APPROVED_SR_TS: ['SR_TS'], REJECTED: ['SR_TS'] },
+      APPROVED_SR_TS: { MRP_STOCK_CHECK: ['MRP'] },
+      MRP_STOCK_CHECK: { ALLOCATED_WORKSHOP: ['MRP'], REGIONAL_COST_ESTIMATE: ['MRP'] },
+      ALLOCATED_WORKSHOP: { EXECUTION: ['WORKSHOP'] },
+      REGIONAL_COST_ESTIMATE: { REGIONAL_PR_PBJ: ['REGIONAL'] },
+      REGIONAL_PR_PBJ: { EXECUTION: ['REGIONAL'] },
+      EXECUTION: { ADDENDUM_REQUESTED: ['JR_TS','SR_TS'], WORK_COMPLETED: ['WORKSHOP','REGIONAL','JR_TS','SR_TS'] },
+      ADDENDUM_REQUESTED: { ADDENDUM_APPROVED: ['SR_TS','OMA_ADMIN'], EXECUTION: ['SR_TS','OMA_ADMIN'] },
+      ADDENDUM_APPROVED: { EXECUTION: ['JR_TS','SR_TS'] },
+      WORK_COMPLETED: { BAST_SUBMITTED: ['JR_TS','KAPAL'] },
+      BAST_SUBMITTED: { PAYMENT_PROCESSED: ['KEUANGAN'] },
+      PAYMENT_PROCESSED: { COMPLETED: ['KEUANGAN','OMA_ADMIN'] },
+      REJECTED: { DRAFT: ['JR_TS','KAPAL'] },
+      COMPLETED: {}
+    };
+
+    const ADMIN_ROLES = ['OMA_ADMIN', 'OMA_2'];
+
+    const STATUS_LABEL = {
+      DRAFT: 'Draf Usulan',
+      SUBMITTED_JR_TS: 'Menunggu Review Sr TS',
+      APPROVED_SR_TS: 'Disetujui Sr TS',
+      MRP_STOCK_CHECK: 'Cek Stok Material (MRP)',
+      ALLOCATED_WORKSHOP: 'Alokasi Workshop Internal',
+      REGIONAL_COST_ESTIMATE: 'Cost Estimate (Regional)',
+      REGIONAL_PR_PBJ: 'Pengadaan PR & Penawaran PBJ',
+      EXECUTION: 'Pelaksanaan Pekerjaan (Eksekusi)',
+      WORK_COMPLETED: 'Pekerjaan Fisik Selesai',
+      ADDENDUM_REQUESTED: 'Menunggu Otorisasi Addendum',
+      ADDENDUM_APPROVED: 'Addendum Disetujui',
+      BAST_SUBMITTED: 'BAST Terbit (Verifikasi Keuangan)',
+      PAYMENT_PROCESSED: 'Pembayaran Telah Diproses',
+      COMPLETED: 'Selesai & Diarsipkan',
+      REJECTED: 'Ditolak (Perlu Revisi)'
+    };
+
+    const ACTION_LABEL = {
+      SUBMITTED_JR_TS: 'Ajukan ke Sr TS',
+      APPROVED_SR_TS: 'Setujui Scope Pekerjaan',
+      REJECTED: 'Tolak & Kembalikan',
+      MRP_STOCK_CHECK: 'Mulai Pemeriksaan Stok',
+      ALLOCATED_WORKSHOP: 'Alokasi ke Workshop (Stok Ada)',
+      REGIONAL_COST_ESTIMATE: 'Eskalasi ke Regional (Perlu Pengadaan)',
+      REGIONAL_PR_PBJ: 'Buat PR & Proses PBJ',
+      EXECUTION: 'Mulai Pelaksanaan Fisik',
+      WORK_COMPLETED: 'Tandai Pekerjaan Selesai',
+      ADDENDUM_REQUESTED: 'Ajukan Pekerjaan Tambahan',
+      ADDENDUM_APPROVED: 'Lanjutkan Eksekusi',
+      BAST_SUBMITTED: 'Unggah BAST + Skor Mutu',
+      PAYMENT_PROCESSED: 'Konfirmasi Pembayaran Selesai',
+      COMPLETED: 'Tutup & Arsipkan Berkas',
+      DRAFT: 'Buka Kembali sebagai Draf'
+    };
+
+    const GATE_NOTES = {
+      'SUBMITTED_JR_TS->APPROVED_SR_TS': 'Gate Teknis: Verifikasi lingkup kerja, estimasi jam, & sertifikat kelas BKI',
+      'MRP_STOCK_CHECK->ALLOCATED_WORKSHOP': 'Jalur Cabang A: Suku cadang & material tersedia di gudang internal',
+      'MRP_STOCK_CHECK->REGIONAL_COST_ESTIMATE': 'Jalur Cabang B: Stok nihil, eskalasi ke Regional (Cost Est → PR → Tender PBJ)',
+      'EXECUTION->ADDENDUM_REQUESTED': 'SOP Docking: Pengajuan pasca Joint Survey / temuan tak terduga',
+      'ADDENDUM_REQUESTED->ADDENDUM_APPROVED': 'Gate SOP: Biaya ≤10% RKA = Otorisasi Sr TS; Biaya >10% RKA = WAJIB Direktur Teknik / OMA',
+      'WORK_COMPLETED->BAST_SUBMITTED': 'Gate BAST: Wajib melampirkan skor evaluasi galangan (0-100), dokumen BAST, dan foto fisik',
+      'BAST_SUBMITTED->PAYMENT_PROCESSED': 'Verifikasi invoice galangan oleh Keuangan; otomatis mengunci BAST ke status PAID',
+      'PAYMENT_PROCESSED->COMPLETED': 'Pengarsipan permanen & pelaporan eksekutif oleh OMA / Keuangan'
+    };
+
+    const FLOW_STEPS_META = [
+      {
+        id: 1, title: '01. Temuan & Draf',
+        desc: 'Input temuan (Defect List) dari Audit, PMS, CAP, atau Breakdown menjadi Work Order.',
+        roles: ['KAPAL', 'JR_TS'], status: 'DRAFT → SUBMITTED_JR_TS',
+        gate: 'Pemeriksaan kelengkapan spesifikasi awal & foto kondisi.'
+      },
+      {
+        id: 2, title: '02. Review Sr TS',
+        desc: 'Verifikasi lingkup teknis, kelayakan kelaiklautan, dan klasifikasi BKI.',
+        roles: ['SR_TS'], status: 'APPROVED_SR_TS / REJECTED',
+        gate: 'Penetapan persetujuan teknis atau pengembalian dengan catatan revisi.'
+      },
+      {
+        id: 3, title: '03. Triase MRP',
+        desc: 'Pemeriksaan stok suku cadang logistik & penentuan rute pelaksanaan.',
+        roles: ['MRP', 'REGIONAL'], status: 'WORKSHOP / REGIONAL PBJ',
+        gate: 'Bercabang: Workshop jika stok cukup, atau Regional jika perlu pengadaan eksternal.'
+      },
+      {
+        id: 4, title: '04. Eksekusi & BA',
+        desc: 'Pelaksanaan fisik di galangan/workshop serta pencatatan 4 milestone Berita Acara.',
+        roles: ['WORKSHOP', 'REGIONAL', 'JR_TS'], status: 'EXECUTION',
+        gate: 'Wajib mencatat BA Joint Survey, Naik Dok, Turun Dok, dan Sea Trial.'
+      },
+      {
+        id: 5, title: '05. Gate Addendum',
+        desc: 'Pekerjaan tambahan jika ditemukan korosi/kerusakan ekstra selama docking.',
+        roles: ['JR_TS', 'SR_TS', 'OMA_ADMIN'], status: 'ADDENDUM_REQUESTED / APPROVED',
+        gate: 'Ambang batas 10% RKA: ≤10% persetujuan Sr TS, >10% wajib Direktur Teknik/OMA.'
+      },
+      {
+        id: 6, title: '06. Serah Terima (BAST)',
+        desc: 'Pekerjaan selesai, penerbitan BAST resmi, penilaian mutu galangan, & dokumentasi foto.',
+        roles: ['KAPAL', 'JR_TS'], status: 'WORK_COMPLETED → BAST_SUBMITTED',
+        gate: 'Hanya bisa dibuat pasca WORK_COMPLETED. Skor 0-100 & berkas fisik wajib diunggah.'
+      },
+      {
+        id: 7, title: '07. Pembayaran & Arsip',
+        desc: 'Pemeriksaan tagihan rekanan oleh Keuangan, pembayaran invoice, dan pengarsipan OMA.',
+        roles: ['KEUANGAN', 'OMA_ADMIN'], status: 'PAYMENT_PROCESSED → COMPLETED',
+        gate: 'Pembayaran otomatis menandai BAST sebagai PAID. Kas terkunci permanen.'
+      }
+    ];
+
+    const TAB_DEFS = [
+      { id: 'dashboard', label: 'Dashboard Ringkasan', icon: 'fa-chart-pie', roles: ['*'] },
+      { id: 'tasks', label: 'Tugas Saya', icon: 'fa-inbox', roles: ['*'] },
+      { id: 'create', label: 'Input Temuan & WO', icon: 'fa-circle-plus', roles: ['JR_TS','KAPAL','OMA_ADMIN','OMA_2'] },
+      { id: 'docking', label: 'Modul Docking & BA', icon: 'fa-anchor', roles: ['JR_TS','SR_TS','OMA_ADMIN','OMA_2'] },
+      { id: 'pipeline', label: 'Pipeline Global', icon: 'fa-diagram-project', roles: ['*'] },
+      { id: 'master', label: 'Master Armada', icon: 'fa-database', roles: ['OMA_ADMIN','OMA_2','SR_TS'] },
+      { id: 'pms', label: 'PMS & Running Hours', icon: 'fa-gauge-high', roles: ['KAPAL','JR_TS','SR_TS','OMA_ADMIN','OMA_2'] },
+      { id: 'guide', label: 'Panduan Alur & Approval', icon: 'fa-route', roles: ['*'] }
+    ];
+
+    // ================= CLIENT STATE =================
+    let currentRole = 'JR_TS'; // Default starting role
+    let orders = [];
+    let fleets = [];
+    let activeTab = 'dashboard';
+    let currentSelectedStep = 1;
+    let stageFilter = '';
+
+    // ================= HELPERS =================
+    function isAdmin() { return ADMIN_ROLES.includes(currentRole); }
+
+    function canAct(order, role) {
+      const targets = TRANSITIONS[order.status] || {};
+      const keys = Object.keys(targets);
+      if (keys.length === 0) return [];
+      if (ADMIN_ROLES.includes(role)) return keys;
+      return keys.filter(to => (targets[to] || []).includes(role));
+    }
+
+    function waitingRoles(status) {
+      const targets = TRANSITIONS[status] || {};
+      const set = new Set();
+      Object.values(targets).forEach(roles => roles.forEach(r => set.add(r)));
+      return [...set];
+    }
+
+    function roleChip(role) {
+      const meta = ROLE_META[role] || { label: role, badgeClass: 'bg-slate-100 text-slate-700 border-slate-200' };
+      return `<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold border ${meta.badgeClass}">${role}</span>`;
+    }
+
+    function statusBadge(status) {
+      if (status === 'COMPLETED') return 'bg-emerald-50 text-emerald-800 border border-emerald-300';
+      if (status === 'REJECTED') return 'bg-rose-50 text-rose-700 border border-rose-300';
+      if (status === 'PAYMENT_PROCESSED' || status === 'WORK_COMPLETED' || status === 'ADDENDUM_APPROVED') return 'bg-teal-50 text-teal-800 border border-teal-300';
+      if (status === 'EXECUTION' || status === 'ALLOCATED_WORKSHOP') return 'bg-blue-50 text-blue-800 border border-blue-300';
+      if (status === 'ADDENDUM_REQUESTED') return 'bg-amber-50 text-amber-800 border border-amber-300 animate-pulse';
+      if (status === 'MRP_STOCK_CHECK' || status === 'REGIONAL_COST_ESTIMATE' || status === 'REGIONAL_PR_PBJ') return 'bg-purple-50 text-purple-800 border border-purple-300';
+      return 'bg-slate-100 text-slate-700 border border-slate-300';
+    }
+
+    function priorityBadge(priority) {
+      if (priority === 'CRITICAL' || priority === 'EMERGENCY') return 'bg-rose-100 text-rose-800 border border-rose-300';
+      if (priority === 'HIGH') return 'bg-amber-100 text-amber-800 border border-amber-300';
+      if (priority === 'LOW') return 'bg-slate-100 text-slate-600 border border-slate-200';
+      return 'bg-blue-100 text-blue-800 border border-blue-200';
+    }
+
+    function fmt(n) { return (n || 0).toLocaleString('id-ID'); }
+    function esc(s) { return String(s || '').replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
+
+    async function api(url, options = {}) {
+      const headers = options.headers || {};
+      headers['Content-Type'] = 'application/json';
+      headers['x-actor-role'] = currentRole;
+      headers['x-actor-id'] = `user-${String(currentRole).toLowerCase()}`;
+      const res = await fetch(url, { ...options, headers });
+      const json = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(json?.error || `HTTP ${res.status}`);
+      return json;
+    }
+
+    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+    // ================= ROLE SWITCHING =================
+    function switchRole(role) {
+      currentRole = role;
+      document.getElementById('selectGlobalRole').value = role;
+      
+      const meta = ROLE_META[role] || ROLE_META.JR_TS;
+      document.getElementById('topRoleAvatar').innerHTML = `<i class="fa-solid ${meta.icon}"></i>`;
+      document.getElementById('quickRoleLabel').innerText = role;
+      document.getElementById('taskSectionRoleLabel').innerText = meta.label;
+
+      renderTabbar();
+      updateNotificationBadge();
+      renderDashboard();
+      renderTasks();
+    }
+
+    // ================= TABS =================
+    function renderTabbar() {
+      const tabs = TAB_DEFS.filter(t => t.roles.includes('*') || t.roles.includes(currentRole));
+      document.getElementById('tabbar').innerHTML = tabs.map(t => `
+        <button id="tabbtn-${t.id}" onclick="switchTab('${t.id}')" class="tab-btn whitespace-nowrap text-xs font-semibold px-3 py-1.5 rounded-xl flex items-center space-x-1.5 transition text-slate-300 hover:text-white hover:bg-deep-800">
+          <i class="fa-solid ${t.icon} text-[11px]"></i><span>${t.label}</span>
+        </button>
+      `).join('');
+      highlightActiveTab();
+    }
+
+    function highlightActiveTab() {
+      document.querySelectorAll('.tab-sec').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(el => {
+        el.classList.remove('bg-brand-700', 'text-white', 'shadow-sm');
+        el.classList.add('text-slate-300');
+      });
+      
+      document.getElementById(`sec-${activeTab}`)?.classList.remove('hidden');
+      const btn = document.getElementById(`tabbtn-${activeTab}`);
+      if (btn) {
+        btn.classList.add('bg-brand-700', 'text-white', 'shadow-sm');
+        btn.classList.remove('text-slate-300');
+      }
+    }
+
+    function switchTab(tabId) {
+      activeTab = tabId;
+      highlightActiveTab();
+
+      if (tabId === 'dashboard') renderDashboard();
+      if (tabId === 'tasks') renderTasks();
+      if (tabId === 'docking') renderDocking();
+      if (tabId === 'pipeline') renderPipeline();
+      if (tabId === 'master') renderMaster();
+      if (tabId === 'pms') loadPms();
+      if (tabId === 'guide') { renderGuideMatrix(); selectFlowStep(currentSelectedStep); }
+    }
+
+    // ================= DATA LOADING =================
+    async function loadAll() {
+      try {
+        const [ordersRes, fleetsRes] = await Promise.all([
+          api('/api/orders'),
+          api('/api/fleets')
+        ]);
+        orders = ordersRes;
+        fleets = fleetsRes;
+
+        renderDashboard();
+        renderTasks();
+        renderDocking();
+        renderPipeline();
+        renderMaster();
+        populateFleetSelect();
+        updateNotificationBadge();
+      } catch (e) {
+        console.error('Error loading master data:', e);
+      }
+    }
+
+    function updateNotificationBadge() {
+      const count = orders.filter(o => {
+        const act = canAct(o, currentRole).length > 0;
+        const addDecision = o.status === 'ADDENDUM_REQUESTED' && (currentRole === 'SR_TS' || isAdmin());
+        return act || addDecision;
+      }).length;
+
+      const topNotice = document.getElementById('topTaskNotice');
+      const topCount = document.getElementById('topTaskCount');
+      if (count > 0) {
+        topNotice.classList.remove('hidden');
+        topNotice.classList.add('inline-flex');
+        topCount.innerText = count;
+      } else {
+        topNotice.classList.add('hidden');
+        topNotice.classList.remove('inline-flex');
+      }
+
+      document.getElementById('dashMyTaskCount').innerText = count;
+      document.getElementById('dashRoleTaskCountBadge').innerText = count;
+    }
+
+    // ================= DASHBOARD RENDERING =================
+    function renderDashboard() {
+      const totalFleets = fleets.length;
+      const totalOrders = orders.length;
+      const activeOrders = orders.filter(o => !['COMPLETED', 'REJECTED'].includes(o.status)).length;
+      
+      const myTasks = orders.filter(o => {
+        const act = canAct(o, currentRole).length > 0;
+        const addDecision = o.status === 'ADDENDUM_REQUESTED' && (currentRole === 'SR_TS' || isAdmin());
+        return act || addDecision;
+      }).length;
+
+      const dockingOrders = orders.filter(o => o.dockingOrder);
+      const totalPagu = dockingOrders.reduce((acc, o) => acc + (o.dockingOrder?.rkaPagu || 0), 0);
+      const totalAddendum = dockingOrders.reduce((acc, o) => acc + (o.dockingOrder?.totalAddendum || 0), 0);
+      
+      const scoredBasts = orders.filter(o => o.bast && o.bast.perfScoreGalangan != null);
+      const avgScore = scoredBasts.length > 0
+        ? (scoredBasts.reduce((acc, o) => acc + (o.bast.perfScoreGalangan || 0), 0) / scoredBasts.length).toFixed(1)
+        : '-';
+
+      // 1. KPI Stats Cards
+      const kpiContainer = document.getElementById('kpiStatsContainer');
+      kpiContainer.innerHTML = `
+        <div class="bg-white border border-soft-border rounded-2xl p-4 shadow-subtle flex flex-col justify-between">
+          <div class="text-[10px] font-mono text-soft-muted uppercase font-semibold">Kapal Terdaftar</div>
+          <div class="text-2xl font-bold font-num text-deep-900 mt-1">${totalFleets}</div>
+          <div class="text-[10px] text-emerald-700 mt-1 flex items-center font-medium"><i class="fa-solid fa-circle-check mr-1 text-[9px]"></i>Aktif Beroperasi</div>
+        </div>
+        <div class="bg-white border border-soft-border rounded-2xl p-4 shadow-subtle flex flex-col justify-between">
+          <div class="text-[10px] font-mono text-soft-muted uppercase font-semibold">Work Order Aktif</div>
+          <div class="text-2xl font-bold font-num text-deep-900 mt-1">${activeOrders}</div>
+          <div class="text-[10px] text-slate-500 mt-1">Total: ${totalOrders} terbit</div>
+        </div>
+        <div class="bg-white border ${myTasks > 0 ? 'border-amber-300 bg-amber-50/40' : 'border-soft-border'} rounded-2xl p-4 shadow-subtle flex flex-col justify-between">
+          <div class="text-[10px] font-mono text-amber-800 uppercase font-bold">Tugas Anda (${currentRole})</div>
+          <div class="text-2xl font-bold font-num text-amber-700 mt-1">${myTasks}</div>
+          <div class="text-[10px] text-amber-800 mt-1 font-semibold">${myTasks > 0 ? 'Menunggu tindakan' : 'Selesai semua'}</div>
+        </div>
+        <div class="bg-white border border-soft-border rounded-2xl p-4 shadow-subtle flex flex-col justify-between">
+          <div class="text-[10px] font-mono text-soft-muted uppercase font-semibold">Pagu RKA Docking</div>
+          <div class="text-sm font-bold font-num text-deep-900 mt-2 truncate">Rp ${fmt(totalPagu)}</div>
+          <div class="text-[10px] text-slate-500 mt-1">${dockingOrders.length} paket docking</div>
+        </div>
+        <div class="bg-white border border-soft-border rounded-2xl p-4 shadow-subtle flex flex-col justify-between">
+          <div class="text-[10px] font-mono text-soft-muted uppercase font-semibold">Addendum Disetujui</div>
+          <div class="text-sm font-bold font-num text-purple-700 mt-2 truncate">Rp ${fmt(totalAddendum)}</div>
+          <div class="text-[10px] text-slate-500 mt-1">${totalPagu > 0 ? ((totalAddendum/totalPagu)*100).toFixed(1)+'%' : '0%'} dari total pagu</div>
+        </div>
+        <div class="bg-white border border-soft-border rounded-2xl p-4 shadow-subtle flex flex-col justify-between">
+          <div class="text-[10px] font-mono text-soft-muted uppercase font-semibold">Skor Mutu Galangan</div>
+          <div class="text-2xl font-bold font-num text-brand-700 mt-1">${avgScore}<span class="text-xs text-slate-400 font-normal">/100</span></div>
+          <div class="text-[10px] text-slate-500 mt-1">${scoredBasts.length} BAST terverifikasi</div>
+        </div>
+      `;
+
+      // 2. Interactive Pipeline Stages Bar
+      const stageKeys = [
+        { key: 'DRAFT', label: '1. Draf Usulan', icon: 'fa-pencil', group: ['DRAFT'] },
+        { key: 'SUBMITTED_JR_TS', label: '2. Review Sr TS', icon: 'fa-user-check', group: ['SUBMITTED_JR_TS','APPROVED_SR_TS'] },
+        { key: 'MRP_STOCK_CHECK', label: '3. Triase MRP', icon: 'fa-boxes-stacked', group: ['MRP_STOCK_CHECK','ALLOCATED_WORKSHOP','REGIONAL_COST_ESTIMATE','REGIONAL_PR_PBJ'] },
+        { key: 'EXECUTION', label: '4. Eksekusi', icon: 'fa-wrench', group: ['EXECUTION','ADDENDUM_REQUESTED','ADDENDUM_APPROVED'] },
+        { key: 'WORK_COMPLETED', label: '5. Selesai Fisik', icon: 'fa-flag-checkered', group: ['WORK_COMPLETED'] },
+        { key: 'BAST_SUBMITTED', label: '6. BAST & Mutu', icon: 'fa-stamp', group: ['BAST_SUBMITTED','PAYMENT_PROCESSED'] },
+        { key: 'COMPLETED', label: '7. Arsip Selesai', icon: 'fa-box-archive', group: ['COMPLETED'] }
+      ];
+
+      const dashPipelineCards = document.getElementById('dashPipelineCards');
+      dashPipelineCards.innerHTML = stageKeys.map(s => {
+        const count = orders.filter(o => s.group.includes(o.status)).length;
+        const isSelected = stageFilter === s.key;
+
+        return `
+          <button onclick="filterPipelineStage('${s.key}')" class="text-left p-3 rounded-xl border transition flex flex-col justify-between ${isSelected ? 'bg-brand-700 text-white shadow-card border-brand-800' : 'bg-slate-50 border-soft-border hover:border-brand-500 hover:bg-white text-deep-900'}">
+            <div class="flex items-center justify-between">
+              <i class="fa-solid ${s.icon} ${isSelected ? 'text-white' : 'text-slate-400'} text-xs"></i>
+              <span class="font-num font-bold text-sm ${isSelected ? 'text-white' : 'text-deep-900'}">${count}</span>
+            </div>
+            <div class="text-[11px] font-semibold mt-2.5 truncate">${s.label}</div>
+          </button>
+        `;
+      }).join('');
+
+      // 3. Fleet Telemetry Grid
+      const fleetGrid = document.getElementById('dashFleetGrid');
+      fleetGrid.innerHTML = fleets.map(f => {
+        const nr = f.noonReports?.[0];
+        const shipOrders = orders.filter(o => o.fleetId === f.id && !['COMPLETED','REJECTED'].includes(o.status));
+        const dockingActive = shipOrders.some(o => o.segmentasi === 'DOCKING');
+
+        return `
+          <div class="bg-slate-50 border border-soft-border rounded-xl p-4 space-y-2.5 hover:border-soft-borderHover transition">
+            <div class="flex items-start justify-between">
+              <div>
+                <div class="flex items-center space-x-1.5">
+                  <span class="text-xs font-mono font-bold text-brand-700 bg-brand-50 border border-brand-200 px-2 py-0.5 rounded">${f.id}</span>
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded ${dockingActive ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}">
+                    ${dockingActive ? 'Masa Docking' : 'Operasi Normal'}
+                  </span>
+                </div>
+                <h4 class="text-sm font-bold font-display text-deep-900 mt-1.5">${f.name}</h4>
+                <div class="text-[11px] text-slate-500">${f.vesselType || 'Kapal Armada'} • ${f.shipowner || 'Internal PT ASDP'}</div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 text-[11px] bg-white p-2.5 rounded-lg border border-soft-border font-sans">
+              <div>
+                <span class="text-slate-400 text-[10px] block">Posisi / Pelabuhan:</span>
+                <span class="font-semibold text-slate-800 truncate block">${nr?.portLokasi || 'Tanjung Perak'}</span>
+              </div>
+              <div>
+                <span class="text-slate-400 text-[10px] block">Jam Kerja Mesin (RH):</span>
+                <span class="font-num font-bold text-brand-700">${nr?.rhMesin ? nr.rhMesin + ' Jam' : '-'}</span>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between text-[11px] pt-1">
+              <span class="text-slate-500">${shipOrders.length} pekerjaan aktif</span>
+              <button onclick="viewFleetOrders('${f.id}')" class="text-brand-700 hover:underline font-semibold flex items-center space-x-1">
+                <span>Daftar Order</span>
+                <i class="fa-solid fa-arrow-right text-[9px]"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // 4. Role Authorization Block
+      const rMeta = ROLE_META[currentRole] || ROLE_META.JR_TS;
+      document.getElementById('dashRoleTitle').innerText = rMeta.label;
+      document.getElementById('dashRoleDesc').innerText = rMeta.desc;
+      document.getElementById('dashRoleRights').innerHTML = rMeta.rights.map(r => `
+        <li class="flex items-center space-x-1.5 truncate">
+          <i class="fa-solid fa-check text-brand-500 text-[10px]"></i>
+          <span class="truncate">${r}</span>
+        </li>
+      `).join('');
+
+      // 5. Audit Feed & Orders Table
+      renderDashboardAuditFeed();
+      renderDashboardOrders();
+    }
+
+    function filterPipelineStage(key) {
+      stageFilter = key;
+      const indicator = document.getElementById('dashStageFilterActive');
+      if (indicator) {
+        indicator.innerText = key ? `Filter: ${key}` : 'Menampilkan Semua';
+      }
+      renderDashboard();
+    }
+
+    function viewFleetOrders(fleetId) {
+      switchTab('pipeline');
+      const input = document.getElementById('pipelineSearchInput');
+      if (input) {
+        input.value = fleetId;
+        renderPipeline();
+      }
+    }
+
+    function renderDashboardAuditFeed() {
+      const feed = document.getElementById('dashAuditFeed');
+      const allTracking = [];
+      orders.forEach(o => {
+        (o.tracking || []).forEach(t => allTracking.push({ ...t, fleetId: o.fleetId, pekerjaan: o.pekerjaan, orderId: o.id }));
+      });
+      allTracking.sort((a,b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+      const latest = allTracking.slice(0, 7);
+      if (latest.length === 0) {
+        feed.innerHTML = `<div class="text-xs text-slate-400 italic py-4 text-center">Belum ada riwayat aktivitas tracking.</div>`;
+        return;
+      }
+
+      feed.innerHTML = latest.map(t => `
+        <div onclick="openOrderDetail('${t.orderId}')" class="cursor-pointer hover:bg-slate-50 p-1.5 rounded-lg transition flex items-start space-x-2 text-xs pb-2 border-b border-soft-border last:border-0">
+          <div class="w-6 h-6 rounded-lg bg-brand-50 text-brand-700 flex items-center justify-center shrink-0 text-[10px] mt-0.5 font-bold">
+            <i class="fa-solid fa-arrow-right"></i>
+          </div>
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center justify-between gap-1">
+              <span class="font-bold text-deep-900 truncate">${t.fleetId}</span>
+              <span class="font-mono text-[10px] text-slate-400">${new Date(t.timestamp).toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' })}</span>
+            </div>
+            <div class="text-[11px] text-slate-600 truncate">${STATUS_LABEL[t.fromStatus] || t.fromStatus} &rarr; <strong>${STATUS_LABEL[t.toStatus] || t.toStatus}</strong></div>
+            <div class="text-[10px] text-slate-400 font-mono">[${t.actorRole}] ${t.notes ? `"${t.notes}"` : ''}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderDashboardOrders() {
+      const segFilter = document.getElementById('dashOrderSegSelect')?.value;
+      let filtered = orders;
+      if (segFilter) filtered = filtered.filter(o => o.segmentasi === segFilter);
+      if (stageFilter) {
+        const stageGroup = {
+          DRAFT: ['DRAFT'],
+          SUBMITTED_JR_TS: ['SUBMITTED_JR_TS','APPROVED_SR_TS'],
+          MRP_STOCK_CHECK: ['MRP_STOCK_CHECK','ALLOCATED_WORKSHOP','REGIONAL_COST_ESTIMATE','REGIONAL_PR_PBJ'],
+          EXECUTION: ['EXECUTION','ADDENDUM_REQUESTED','ADDENDUM_APPROVED'],
+          WORK_COMPLETED: ['WORK_COMPLETED'],
+          BAST_SUBMITTED: ['BAST_SUBMITTED','PAYMENT_PROCESSED'],
+          COMPLETED: ['COMPLETED']
+        }[stageFilter] || [];
+        filtered = filtered.filter(o => stageGroup.includes(o.status));
+      }
+
+      const tbody = document.getElementById('dashOrdersTbody');
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400">Tidak ada pekerjaan yang cocok dengan filter.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.slice(0, 8).map(o => `
+        <tr class="hover:bg-slate-50/70 transition">
+          <td class="py-2.5 px-3">
+            <span class="font-mono font-bold text-deep-900">${o.fleetId}</span>
+          </td>
+          <td class="py-2.5 px-3">
+            <div class="font-semibold text-deep-900 truncate max-w-xs">${o.pekerjaan}</div>
+            <div class="text-[10px] text-slate-400 truncate max-w-xs">${o.defect?.deskripsi || '-'}</div>
+          </td>
+          <td class="py-2.5 px-3">
+            <span class="font-mono text-[10px] px-2 py-0.5 rounded bg-slate-100 text-slate-700 uppercase font-semibold">${o.segmentasi.replace('_',' ')}</span>
+          </td>
+          <td class="py-2.5 px-3">
+            <span class="text-[10px] px-2 py-0.5 rounded font-bold ${statusBadge(o.status)}">${STATUS_LABEL[o.status] || o.status}</span>
+          </td>
+          <td class="py-2.5 px-3 text-right">
+            <button onclick="openOrderDetail('${o.id}')" class="text-xs text-brand-700 hover:text-brand-900 font-semibold px-2 py-1 rounded bg-brand-50 hover:bg-brand-100 transition">
+              Detail &rarr;
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // ================= TUGAS SAYA (TASK SECTION) =================
+    function renderTasks() {
+      const container = document.getElementById('tasksContainer');
+      const mine = orders.filter(o => {
+        const act = canAct(o, currentRole).length > 0;
+        const addDecision = o.status === 'ADDENDUM_REQUESTED' && (currentRole === 'SR_TS' || isAdmin());
+        return act || addDecision;
+      });
+
+      document.getElementById('taskCountDetail').innerText = `${mine.length} item menunggu`;
+
+      if (mine.length === 0) {
+        container.innerHTML = `
+          <div class="bg-white border border-soft-border p-12 rounded-2xl text-center shadow-subtle">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl mx-auto mb-3">
+              <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <h3 class="text-base font-bold font-display text-deep-900">Kotak Tugas Bersih</h3>
+            <p class="text-xs text-soft-muted mt-1 max-w-md mx-auto">
+              Tidak ada pekerjaan yang membutuhkan otorisasi dari peran <strong>${currentRole}</strong> saat ini. Seluruh pesanan telah diproses ke tahapan selanjutnya.
+            </p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = mine.map(o => renderTaskCard(o)).join('');
+    }
+
+    function renderTaskCard(o) {
+      const targets = canAct(o, currentRole);
+      const isAddDecision = o.status === 'ADDENDUM_REQUESTED' && (currentRole === 'SR_TS' || isAdmin());
+      
+      let actionsHtml = '';
+      if (isAddDecision) {
+        const pending = (o.dockingOrder?.addendums || []).filter(a => !a.approved && !a.rejected);
+        actionsHtml = pending.map(a => `
+          <div class="p-3.5 bg-amber-50 border border-amber-200 rounded-xl space-y-2 mt-2">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-amber-950">${a.uraian}</span>
+              <span class="font-mono font-bold text-amber-900">Rp ${fmt(a.estimasiBiaya)} (${a.persentasePagu.toFixed(1)}% RKA)</span>
+            </div>
+            <div class="text-[11px] text-amber-900">
+              ${a.needsDirtek 
+                ? '<span class="text-rose-700 font-bold"><i class="fa-solid fa-triangle-exclamation mr-1"></i>&gt;10% Pagu: Otorisasi wajib level Direktur Teknik / OMA</span>' 
+                : '<span><i class="fa-solid fa-circle-check mr-1 text-emerald-600"></i>&le;10% Pagu: Cukup persetujuan Sr TS</span>'}
+            </div>
+            <div class="flex items-center space-x-2 pt-1">
+              <button onclick="openAddDecision('${a.id}','approve','${esc(a.uraian)}')" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-lg transition shadow-sm">
+                <i class="fa-solid fa-check mr-1"></i>Setujui Addendum
+              </button>
+              <button onclick="openAddDecision('${a.id}','reject','${esc(a.uraian)}')" class="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-lg transition shadow-sm">
+                <i class="fa-solid fa-xmark mr-1"></i>Tolak Addendum
+              </button>
+            </div>
+          </div>
+        `).join('');
+      } else {
+        actionsHtml = `<div class="flex flex-wrap gap-2">` + targets.map(to => {
+          if (to === 'BAST_SUBMITTED') {
+            return `
+              <button onclick="openBast('${o.id}')" class="px-3.5 py-2 bg-purple-700 hover:bg-purple-800 text-white font-bold text-xs rounded-xl transition shadow-sm flex items-center space-x-1.5">
+                <i class="fa-solid fa-stamp"></i><span>${ACTION_LABEL[to]}</span>
+              </button>
+            `;
+          }
+          if (to === 'ADDENDUM_REQUESTED') {
+            if (!o.dockingOrder) return '';
+            return `
+              <button onclick="openAddendum('${o.dockingOrder.id}','${o.fleetId}','${esc(o.pekerjaan)}')" class="px-3.5 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl transition shadow-sm flex items-center space-x-1.5">
+                <i class="fa-solid fa-file-circle-plus"></i><span>${ACTION_LABEL[to]}</span>
+              </button>
+            `;
+          }
+          return `
+            <button onclick="openTransition('${o.id}','${to}','${esc(o.pekerjaan)}')" class="px-3.5 py-2 bg-brand-700 hover:bg-brand-800 text-white font-bold text-xs rounded-xl transition shadow-sm">
+              ${ACTION_LABEL[to] || to}
+            </button>
+          `;
+        }).join('') + `</div>`;
+      }
+
+      return `
+        <div class="bg-white border border-soft-border rounded-2xl p-5 shadow-subtle space-y-3 hover:border-soft-borderHover transition">
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <div class="space-y-1">
+              <div class="flex items-center flex-wrap gap-1.5">
+                <span class="text-xs font-mono font-bold text-deep-900 bg-slate-100 px-2.5 py-0.5 rounded-lg border border-slate-200">${o.fleetId}</span>
+                <span class="text-[10px] px-2 py-0.5 rounded uppercase font-semibold bg-slate-100 text-slate-700">${o.segmentasi.replace('_',' ')}</span>
+                <span class="text-[10px] px-2 py-0.5 rounded font-bold ${priorityBadge(o.defect?.priority)}">${o.defect?.priority || 'MEDIUM'}</span>
+                <span class="text-[10px] px-2 py-0.5 rounded font-bold ${statusBadge(o.status)}">${STATUS_LABEL[o.status] || o.status}</span>
+              </div>
+              <h3 class="text-base font-bold text-deep-900 font-display mt-1">${o.pekerjaan}</h3>
+              <p class="text-xs text-slate-600">${o.defect?.deskripsi || '-'}</p>
+              ${o.dockingOrder ? `
+                <div class="text-[11px] text-slate-500 font-mono mt-1">
+                  <i class="fa-solid fa-anchor text-brand-700 mr-1"></i>Docking Target: ${o.dockingOrder.targetDays} hari • Pagu: Rp ${fmt(o.dockingOrder.rkaPagu)}
+                </div>
+              ` : ''}
+            </div>
+
+            <div class="flex flex-col items-end space-y-2">
+              ${actionsHtml}
+              <button onclick="openOrderDetail('${o.id}')" class="text-xs text-brand-700 hover:text-brand-900 font-semibold underline mt-1">
+                Rincian &amp; Audit Trail &rarr;
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // ================= ACTIONS & MODAL HANDLERS =================
+    function openTransition(orderId, toStatus, pekerjaan) {
+      document.getElementById('transOrderId').value = orderId;
+      document.getElementById('transToStatus').value = toStatus;
+      document.getElementById('transTitle').innerText = ACTION_LABEL[toStatus] || toStatus;
+      document.getElementById('transSummary').innerHTML = `
+        <div class="font-bold text-deep-900 text-sm mb-1">${pekerjaan}</div>
+        <div class="text-[11px] text-slate-600">Pekerjaan akan diproses ke status: <strong class="text-brand-800">${STATUS_LABEL[toStatus] || toStatus}</strong></div>
+      `;
+      document.getElementById('transNotes').value = '';
+      openModal('modalTransition');
+    }
+
+    async function submitTransition(e) {
+      e.preventDefault();
+      const orderId = document.getElementById('transOrderId').value;
+      const toStatus = document.getElementById('transToStatus').value;
+      const notes = document.getElementById('transNotes').value;
+      try {
+        await api(`/api/orders/${orderId}/transition`, {
+          method: 'POST',
+          body: JSON.stringify({ toStatus, notes })
+        });
+        closeModal('modalTransition');
+        await loadAll();
+      } catch (err) {
+        alert('Gagal mengeksekusi transisi: ' + err.message);
+      }
+    }
+
+    function openAddendum(dockingId, fleetId, pekerjaan) {
+      document.getElementById('addendumDockingId').value = dockingId;
+      const order = orders.find(o => o.dockingOrder?.id === dockingId);
+      const pagu = order?.dockingOrder?.rkaPagu || 0;
+      const totalAdd = order?.dockingOrder?.totalAddendum || 0;
+
+      document.getElementById('addendumSummary').innerHTML = `
+        <div class="font-bold text-deep-900 text-xs mb-1">${fleetId} — ${pekerjaan}</div>
+        <div class="text-[11px] text-slate-600 font-mono">Pagu RKA: Rp ${fmt(pagu)} • Realisasi Addendum Berjalan: Rp ${fmt(totalAdd)}</div>
+      `;
+      document.getElementById('addendumUraian').value = '';
+      document.getElementById('addendumBiaya').value = '';
+      document.getElementById('addendumWarningBadge').classList.add('hidden');
+      openModal('modalAddendum');
+    }
+
+    function calcAddendumPct(val) {
+      const dockingId = document.getElementById('addendumDockingId').value;
+      const order = orders.find(o => o.dockingOrder?.id === dockingId);
+      const pagu = order?.dockingOrder?.rkaPagu || 0;
+      const badge = document.getElementById('addendumWarningBadge');
+      const cost = parseFloat(val) || 0;
+
+      if (pagu > 0 && cost > 0) {
+        const pct = (cost / pagu) * 100;
+        badge.classList.remove('hidden');
+        if (pct > 10) {
+          badge.className = 'mt-2 p-2.5 rounded-xl text-[11px] font-semibold bg-rose-50 border border-rose-200 text-rose-800';
+          badge.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i>Estimasi ${pct.toFixed(1)}% dari Pagu RKA: <strong>Wajib Otorisasi OMA / Direktur Teknik</strong>`;
+        } else {
+          badge.className = 'mt-2 p-2.5 rounded-xl text-[11px] font-semibold bg-emerald-50 border border-emerald-200 text-emerald-800';
+          badge.innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i>Estimasi ${pct.toFixed(1)}% dari Pagu RKA: Cukup disahkan oleh Senior Superintendent (Sr TS)`;
+        }
+      } else {
+        badge.classList.add('hidden');
+      }
+    }
+
+    async function submitAddendum(e) {
+      e.preventDefault();
+      const dockingOrderId = document.getElementById('addendumDockingId').value;
+      const uraian = document.getElementById('addendumUraian').value;
+      const estimasiBiaya = document.getElementById('addendumBiaya').value;
+      try {
+        await api('/api/docking/addendum', {
+          method: 'POST',
+          body: JSON.stringify({ dockingOrderId, uraian, estimasiBiaya })
+        });
+        closeModal('modalAddendum');
+        await loadAll();
+      } catch (err) {
+        alert('Gagal mengajukan addendum: ' + err.message);
+      }
+    }
+
+    function openAddDecision(addendumId, action, uraian) {
+      document.getElementById('addDecisionId').value = addendumId;
+      document.getElementById('addDecisionAction').value = action;
+      document.getElementById('addDecisionTitle').innerHTML = action === 'approve'
+        ? `<i class="fa-solid fa-gavel text-emerald-600 mr-1.5"></i>Persetujuan Addendum Pekerjaan`
+        : `<i class="fa-solid fa-ban text-rose-600 mr-1.5"></i>Penolakan Addendum Pekerjaan`;
+      
+      document.getElementById('addDecisionSummary').innerHTML = `<div class="font-bold text-deep-900">${uraian}</div>`;
+      document.getElementById('addDecisionNotes').value = '';
+      
+      const submitBtn = document.getElementById('addDecisionSubmit');
+      submitBtn.className = action === 'approve'
+        ? 'px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-sm'
+        : 'px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl shadow-sm';
+      submitBtn.innerText = action === 'approve' ? 'Setujui Addendum' : 'Tolak Addendum';
+      
+      openModal('modalAddendumDecision');
+    }
+
+    async function submitAddDecision(e) {
+      e.preventDefault();
+      const id = document.getElementById('addDecisionId').value;
+      const action = document.getElementById('addDecisionAction').value;
+      const catatan = document.getElementById('addDecisionNotes').value;
+      try {
+        await api(`/api/docking/addendum/${id}/${action}`, {
+          method: 'POST',
+          body: JSON.stringify({ catatan })
+        });
+        closeModal('modalAddendumDecision');
+        await loadAll();
+      } catch (err) {
+        alert('Gagal memutuskan addendum: ' + err.message);
+      }
+    }
+
+    function openMilestone(dockingId) {
+      document.getElementById('milestoneDockingId').value = dockingId;
+      openModal('modalMilestone');
+    }
+
+    async function submitMilestone(e) {
+      e.preventDefault();
+      const dockingOrderId = document.getElementById('milestoneDockingId').value;
+      const tipeBa = document.getElementById('milestoneTipe').value;
+      const dokumenBaUrl = document.getElementById('milestoneDocUrl').value;
+      try {
+        await api('/api/docking/milestone', {
+          method: 'POST',
+          body: JSON.stringify({ dockingOrderId, tipeBa, dokumenBaUrl })
+        });
+        closeModal('modalMilestone');
+        await loadAll();
+      } catch (err) {
+        alert('Gagal mencatat milestone BA: ' + err.message);
+      }
+    }
+
+    function openBast(orderId) {
+      const o = orders.find(x => x.id === orderId);
+      document.getElementById('bastOrderId').value = orderId;
+      document.getElementById('bastSummary').innerHTML = `
+        <div class="font-bold text-deep-900 text-xs mb-1">${o?.fleetId} — ${o?.pekerjaan}</div>
+        <div class="text-[11px] text-slate-600">Pekerjaan fisik telah selesai. Masukkan evaluasi skor galangan dan tautan berkas resmi.</div>
+      `;
+      document.getElementById('bastCatatan').value = '';
+      openModal('modalBast');
+    }
+
+    async function submitBast(e) {
+      e.preventDefault();
+      const orderId = document.getElementById('bastOrderId').value;
+      const perfScoreGalangan = document.getElementById('bastScore').value;
+      const catatan = document.getElementById('bastCatatan').value;
+      const dokumenBastUrl = document.getElementById('bastDocUrl').value;
+      const fotoUrl = document.getElementById('bastFotoUrl').value;
+      try {
+        await api(`/api/orders/${orderId}/bast`, {
+          method: 'POST',
+          body: JSON.stringify({ perfScoreGalangan, catatan, dokumenBastUrl, fotoUrl })
+        });
+        closeModal('modalBast');
+        await loadAll();
+      } catch (err) {
+        alert('Gagal mengesahkan BAST: ' + err.message);
+      }
+    }
+
+    async function submitNewOrder(e) {
+      e.preventDefault();
+      const payload = {
+        fleetId: document.getElementById('inputFleetId').value,
+        sumber: document.getElementById('inputSumber').value,
+        deskripsi: document.getElementById('inputDeskripsi').value,
+        priority: document.getElementById('inputPriority').value,
+        segmentasi: document.getElementById('inputSegmentasi').value,
+        pekerjaan: document.getElementById('inputPekerjaan').value,
+        targetDays: document.getElementById('inputTargetDays').value,
+        rkaPagu: document.getElementById('inputRkaPagu').value
+      };
+      try {
+        await api('/api/orders', { method: 'POST', body: JSON.stringify(payload) });
+        document.getElementById('formNewOrder').reset();
+        toggleDockingFields(document.getElementById('inputSegmentasi').value);
+        alert('Work Order berhasil dibuat dan tersimpan pada status DRAFT.');
+        await loadAll();
+        switchTab('tasks');
+      } catch (err) {
+        alert('Gagal membuat Work Order: ' + err.message);
+      }
+    }
+
+    function toggleDockingFields(val) {
+      document.getElementById('dockingExtraFields').classList.toggle('hidden', val !== 'DOCKING');
+    }
+
+    async function syncSmartsheet() {
+      const btn = document.getElementById('btnSyncTop');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Sinkronisasi...';
+      try {
+        const res = await fetch('/api/sync/smartsheet', { method: 'POST' });
+        const json = await res.json();
+        alert(`Sinkronisasi Smartsheet Berhasil:\n• Kapal Terupdate: ${json.syncedFleets}\n• Noon Report: ${json.syncedNoonReports}\n• Item PMS: ${json.syncedPms}`);
+        await loadAll();
+      } catch (err) {
+        alert('Gagal sinkronisasi: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-arrows-rotate text-brand-500 mr-1.5"></i><span class="hidden md:inline">Sync Data</span>';
+      }
+    }
+
+    // ================= ORDER DETAIL INSPECTOR MODAL =================
+    function openOrderDetail(orderId) {
+      const o = orders.find(x => x.id === orderId);
+      if (!o) return;
+
+      document.getElementById('detailModalSubtitle').innerText = `ID: ${o.id} • Dibuat: ${new Date(o.createdAt).toLocaleDateString('id-ID')}`;
+      
+      const body = document.getElementById('detailModalBody');
+      const d = o.dockingOrder;
+      const b = o.bast;
+
+      body.innerHTML = `
+        <!-- Main Header Box -->
+        <div class="bg-slate-50 p-4 rounded-xl border border-soft-border space-y-2">
+          <div class="flex items-center flex-wrap gap-2">
+            <span class="font-mono font-bold text-xs bg-white px-2.5 py-0.5 rounded-lg border border-slate-300 text-deep-900">${o.fleetId}</span>
+            <span class="text-[10px] uppercase font-bold px-2.5 py-0.5 rounded-lg bg-white text-slate-700 border border-slate-300">${o.segmentasi.replace('_',' ')}</span>
+            <span class="text-[10px] px-2.5 py-0.5 rounded-lg font-bold ${priorityBadge(o.defect?.priority)}">${o.defect?.priority || 'NORMAL'}</span>
+            <span class="text-[10px] px-2.5 py-0.5 rounded-lg font-bold ${statusBadge(o.status)}">${STATUS_LABEL[o.status] || o.status}</span>
+          </div>
+          <h4 class="text-base font-bold text-deep-900 font-display">${o.pekerjaan}</h4>
+          <p class="text-xs text-slate-600">${o.defect?.deskripsi || '-'}</p>
+          <div class="text-[11px] text-slate-500 font-mono">Sumber: ${o.defect?.sumber || 'UNPLANNED'} • Due: ${o.defect?.dueDate ? new Date(o.defect.dueDate).toLocaleDateString('id-ID') : '-'}</div>
+        </div>
+
+        ${d ? `
+          <!-- Docking Details -->
+          <div class="bg-brand-50/60 p-4 rounded-xl border border-brand-200 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-brand-900 flex items-center space-x-1.5">
+                <i class="fa-solid fa-anchor"></i>
+                <span>Spesifikasi Pelaksanaan Docking</span>
+              </span>
+              <span class="font-mono font-bold text-brand-800">Target: ${d.targetDays} Hari</span>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-3 font-mono text-xs">
+              <div class="bg-white p-2.5 rounded-xl border border-brand-200">
+                <span class="text-slate-400 block text-[10px]">PAGU RKA AWAL:</span>
+                <span class="font-bold text-deep-900">Rp ${fmt(d.rkaPagu)}</span>
+              </div>
+              <div class="bg-white p-2.5 rounded-xl border border-brand-200">
+                <span class="text-slate-400 block text-[10px]">TOTAL ADDENDUM:</span>
+                <span class="font-bold text-purple-700">Rp ${fmt(d.totalAddendum)}</span>
+              </div>
+            </div>
+
+            <!-- 4 Milestone checklist -->
+            <div>
+              <div class="text-[11px] font-bold text-slate-700 mb-1.5">Verifikasi 4 Milestone Berita Acara SOP:</div>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
+                ${['JOINT_SURVEY','NAIK_DOK','TURUN_DOK','SEA_TRIAL'].map(m => {
+                  const done = (d.milestones || []).find(x => x.tipeBa === m);
+                  return `
+                    <div class="p-2.5 rounded-xl border text-[10px] ${done ? 'bg-emerald-50 border-emerald-300 text-emerald-800 font-bold' : 'bg-white border-soft-border text-slate-400'}">
+                      <div>${m.replace('_',' ')}</div>
+                      <div class="mt-0.5">${done ? '<i class="fa-solid fa-check"></i> Disahkan' : 'Belum'}</div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+
+            <!-- Addendums list -->
+            ${(d.addendums || []).length > 0 ? `
+              <div>
+                <div class="text-[11px] font-bold text-slate-700 mb-1">Riwayat Addendum (${d.addendums.length}):</div>
+                <div class="space-y-1.5">
+                  ${d.addendums.map(a => `
+                    <div class="flex items-center justify-between p-2 rounded-lg bg-white border border-brand-200 text-[11px]">
+                      <div>
+                        <div class="font-semibold text-deep-900">${a.uraian}</div>
+                        <div class="text-[10px] text-slate-500 font-mono">Rp ${fmt(a.estimasiBiaya)} (${a.persentasePagu.toFixed(1)}% RKA)</div>
+                      </div>
+                      <span class="font-bold ${a.approved ? 'text-emerald-700' : a.rejected ? 'text-rose-700' : 'text-amber-700'}">
+                        ${a.approved ? 'Disetujui' : a.rejected ? 'Ditolak' : 'Menunggu Otorisasi'}
+                      </span>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        ` : ''}
+
+        ${b ? `
+          <!-- BAST Record -->
+          <div class="bg-purple-50 p-4 rounded-xl border border-purple-200 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-purple-900 flex items-center space-x-1.5">
+                <i class="fa-solid fa-certificate"></i>
+                <span>Berita Acara Serah Terima (BAST)</span>
+              </span>
+              <span class="font-bold px-2 py-0.5 rounded text-[10px] ${b.keuanganStatus === 'PAID' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                Status Kas: ${b.keuanganStatus}
+              </span>
+            </div>
+            <div class="flex items-center space-x-4">
+              <div>
+                <span class="text-slate-500 text-[11px]">Skor Evaluasi Mutu:</span>
+                <span class="font-mono font-extrabold text-purple-800 text-base ml-1">${b.perfScoreGalangan}/100</span>
+              </div>
+            </div>
+            <p class="text-xs text-slate-700 italic">"${b.catatan || 'Tidak ada catatan khusus.'}"</p>
+          </div>
+        ` : ''}
+
+        <!-- Audit Trail Stepper -->
+        <div class="space-y-2">
+          <h5 class="font-bold text-deep-900 flex items-center space-x-1.5 text-xs">
+            <i class="fa-solid fa-timeline text-brand-700"></i>
+            <span>Log Jejak Audit Lengkap (${(o.tracking || []).length} entri)</span>
+          </h5>
+          <div class="space-y-2.5 border-l-2 border-slate-300 pl-4 ml-2">
+            ${(o.tracking || []).map(t => `
+              <div class="relative text-xs text-slate-600">
+                <div class="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full bg-brand-700 border-2 border-white"></div>
+                <div class="flex items-center space-x-2">
+                  <span class="font-mono text-[10px] text-slate-400">${new Date(t.timestamp).toLocaleString('id-ID')}</span>
+                  <span class="font-bold text-deep-900">[${t.actorRole}]</span>
+                  <span class="text-slate-500 font-mono text-[10px]">${t.fromStatus} &rarr;</span>
+                  <span class="font-bold text-brand-800">${t.toStatus}</span>
+                </div>
+                ${t.notes ? `<div class="text-[11px] text-slate-600 italic mt-0.5">"${t.notes}"</div>` : ''}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+
+      openModal('modalDetail');
+    }
+
+    // ================= DOCKING MODULE =================
+    function renderDocking() {
+      const container = document.getElementById('dockingContainer');
+      const dockingOrders = orders.filter(o => o.dockingOrder && !['COMPLETED'].includes(o.status));
+
+      if (dockingOrders.length === 0) {
+        container.innerHTML = `
+          <div class="bg-white border border-soft-border p-12 rounded-2xl text-center shadow-subtle">
+            <i class="fa-solid fa-anchor text-slate-300 text-3xl mb-2"></i>
+            <div class="text-sm font-bold text-deep-900">Tidak Ada Docking Aktif</div>
+            <div class="text-xs text-soft-muted mt-1">Seluruh pekerjaan docking telah rampung atau belum diterbitkan.</div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = dockingOrders.map(o => {
+        const d = o.dockingOrder;
+        const milestones = d.milestones || [];
+        const addendums = d.addendums || [];
+        const usePct = d.rkaPagu > 0 ? Math.min(100, (d.totalAddendum / d.rkaPagu) * 100) : 0;
+        const canMilestone = ['EXECUTION','ADDENDUM_REQUESTED','ADDENDUM_APPROVED'].includes(o.status) && (['JR_TS','SR_TS'].includes(currentRole) || isAdmin());
+
+        return `
+          <div class="bg-white border border-soft-border rounded-2xl p-5 shadow-subtle space-y-4">
+            <div class="flex flex-wrap justify-between items-start gap-3 border-b border-soft-border pb-3">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="font-mono font-bold text-xs bg-slate-100 text-deep-900 px-2 py-0.5 rounded border border-slate-300">${o.fleetId}</span>
+                  <span class="text-[10px] px-2 py-0.5 rounded font-bold ${statusBadge(o.status)}">${STATUS_LABEL[o.status] || o.status}</span>
+                </div>
+                <h3 class="text-base font-bold font-display text-deep-900 mt-1">${o.pekerjaan}</h3>
+                <div class="text-xs text-slate-500 mt-0.5 font-mono">Target: ${d.targetDays} hari • Pagu RKA: Rp ${fmt(d.rkaPagu)} • Addendum: Rp ${fmt(d.totalAddendum)}</div>
+              </div>
+              <div class="flex items-center space-x-2">
+                ${canMilestone ? `
+                  <button onclick="openMilestone('${d.id}')" class="text-xs bg-brand-700 hover:bg-brand-800 text-white font-semibold px-3 py-1.5 rounded-xl shadow-sm transition">
+                    <i class="fa-solid fa-file-signature mr-1"></i>Catat Milestone BA
+                  </button>
+                ` : ''}
+                <button onclick="openOrderDetail('${o.id}')" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-1.5 rounded-xl border border-slate-200">
+                  Rincian
+                </button>
+              </div>
+            </div>
+
+            <!-- Milestone Grid -->
+            <div>
+              <div class="text-xs font-semibold text-slate-700 mb-1.5">Verifikasi 4 Milestone Berita Acara SOP:</div>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                ${['JOINT_SURVEY','NAIK_DOK','TURUN_DOK','SEA_TRIAL'].map(mType => {
+                  const done = milestones.find(m => m.tipeBa === mType);
+                  return `
+                    <div class="p-3 rounded-xl border text-center text-xs ${done ? 'bg-emerald-50 border-emerald-300 text-emerald-800 font-semibold' : 'bg-slate-50 border-soft-border text-slate-400'}">
+                      <div class="text-[11px] font-bold tracking-tight">${mType.replace('_',' ')}</div>
+                      <div class="text-[10px] mt-1">${done ? '<i class="fa-solid fa-check mr-0.5 text-emerald-600"></i>Terverifikasi' : 'Belum Terlaksana'}</div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+
+            <!-- Addendum Meter -->
+            <div class="bg-slate-50 rounded-xl p-4 border border-soft-border space-y-2">
+              <div class="flex justify-between items-center text-xs">
+                <span class="font-bold text-deep-900 flex items-center space-x-1.5">
+                  <i class="fa-solid fa-scale-balanced text-amber-600"></i>
+                  <span>Penggunaan Pagu RKA oleh Addendum: ${usePct.toFixed(1)}%</span>
+                </span>
+                <span class="text-[11px] text-slate-500 font-mono">Ambang Batas Dirtek: &gt;10%</span>
+              </div>
+              
+              <div class="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
+                <div class="h-2.5 rounded-full ${usePct > 10 ? 'bg-rose-600' : 'bg-emerald-600'} transition-all" style="width:${usePct}%"></div>
+              </div>
+
+              ${addendums.length > 0 ? `
+                <div class="space-y-1.5 pt-2">
+                  ${addendums.map(a => `
+                    <div class="flex justify-between items-center text-xs bg-white p-2.5 rounded-xl border border-soft-border">
+                      <div>
+                        <div class="font-semibold text-deep-900">${a.uraian}</div>
+                        <div class="text-[10px] text-slate-500 font-mono">Rp ${fmt(a.estimasiBiaya)} (${a.persentasePagu.toFixed(1)}% RKA) ${a.needsDirtek ? '• <span class="text-rose-700 font-bold">Wajib OMA/Dirtek</span>' : ''}</div>
+                      </div>
+                      <span class="text-[10px] font-bold ${a.approved ? 'text-emerald-700' : a.rejected ? 'text-rose-700' : 'text-amber-700'}">
+                        ${a.approved ? 'Disetujui' : a.rejected ? 'Ditolak' : 'Menunggu Otorisasi'}
+                      </span>
+                    </div>
+                  `).join('')}
+                </div>
+              ` : '<div class="text-[11px] text-slate-400 italic">Belum ada addendum pekerjaan tambahan yang diajukan.</div>'}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ================= PIPELINE GLOBAL =================
+    function renderPipeline() {
+      const container = document.getElementById('pipelineContainer');
+      const search = document.getElementById('pipelineSearchInput')?.value?.toLowerCase() || '';
+      const statusFilter = document.getElementById('pipelineStatusFilter')?.value || '';
+
+      let filtered = orders;
+      if (search) {
+        filtered = filtered.filter(o => o.fleetId.toLowerCase().includes(search) || o.pekerjaan.toLowerCase().includes(search));
+      }
+      if (statusFilter) {
+        filtered = filtered.filter(o => o.status === statusFilter);
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="bg-white border border-soft-border p-8 rounded-2xl text-center text-slate-500 text-xs shadow-subtle">Tidak ada order yang cocok dengan filter pencarian.</div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(o => {
+        const waiting = waitingRoles(o.status);
+        return `
+          <div class="bg-white border border-soft-border rounded-2xl p-4 shadow-subtle space-y-2 hover:border-soft-borderHover transition">
+            <div class="flex flex-wrap justify-between items-center gap-2">
+              <div class="flex items-center flex-wrap gap-2">
+                <span class="text-xs font-mono font-bold text-deep-900 bg-slate-100 px-2 py-0.5 rounded border border-slate-300">${o.fleetId}</span>
+                <span class="text-sm font-bold font-display text-deep-900">${o.pekerjaan}</span>
+                <span class="text-[10px] uppercase font-semibold bg-slate-100 text-slate-600 px-2 py-0.5 rounded">${o.segmentasi.replace('_',' ')}</span>
+              </div>
+              <div class="flex items-center space-x-2">
+                <span class="text-[10px] px-2 py-0.5 rounded font-bold ${statusBadge(o.status)}">${STATUS_LABEL[o.status] || o.status}</span>
+                <button onclick="openOrderDetail('${o.id}')" class="text-xs text-brand-700 hover:text-brand-900 font-semibold px-2 py-1 rounded bg-brand-50">
+                  Audit &rarr;
+                </button>
+              </div>
+            </div>
+            <div class="text-xs text-slate-500 flex flex-wrap items-center gap-1.5 pt-1 border-t border-soft-border">
+              <span>Menunggu Otorisasi:</span>
+              ${waiting.length ? waiting.map(r => roleChip(r)).join('') : '<span class="text-emerald-700 font-bold">Telah Rampung &amp; Diarsipkan</span>'}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ================= MASTER DATA ARMADA =================
+    function renderMaster() {
+      const container = document.getElementById('fleetCardsContainer');
+      if (!container) return;
+
+      if (fleets.length === 0) {
+        container.innerHTML = `<div class="bg-white border border-soft-border p-8 rounded-2xl text-center text-slate-500 text-xs col-span-2 shadow-subtle">Belum ada data kapal. Klik "Sinkronkan Ulang Smartsheet".</div>`;
+        return;
+      }
+
+      container.innerHTML = fleets.map(f => {
+        const nr = f.noonReports?.[0];
+        return `
+          <div class="bg-white border border-soft-border rounded-2xl p-5 shadow-subtle space-y-3">
+            <div class="flex justify-between items-start">
+              <div>
+                <span class="text-xs font-mono font-bold text-brand-700 bg-brand-50 border border-brand-200 px-2 py-0.5 rounded">${f.id}</span>
+                <h3 class="text-base font-bold font-display text-deep-900 mt-1">${f.name}</h3>
+                <p class="text-xs text-slate-500">${f.vesselType || 'General Cargo / Ferry'} • ${f.shipowner || 'PT ASDP Indonesia'}</p>
+              </div>
+              <span class="text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-300 px-2 py-0.5 rounded font-bold">Siap Operasi</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 text-xs bg-slate-50 p-3 rounded-xl border border-soft-border font-mono">
+              <div><span class="text-slate-400 text-[10px] block">NOMOR IMO:</span> <span class="font-bold text-slate-800">${f.imoNo || '-'}</span></div>
+              <div><span class="text-slate-400 text-[10px] block">RH MESIN INDUK:</span> <span class="font-bold text-brand-700">${nr ? nr.rhMesin + ' Jam' : '-'}</span></div>
+              <div><span class="text-slate-400 text-[10px] block">PELABUHAN TERAKHIR:</span> <span class="font-bold text-slate-800">${nr?.portLokasi || '-'}</span></div>
+              <div><span class="text-slate-400 text-[10px] block">SISA BAHAN BAKAR (FOB):</span> <span class="font-bold text-slate-800">${nr ? nr.robMfo + ' Ton' : '-'}</span></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ================= PMS DATA =================
+    async function loadPms() {
+      try {
+        const pms = await api('/api/pms');
+        const tbody = document.getElementById('pmsTableBody');
+        if (pms.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400">Belum ada data PMS terunggah. Lakukan sinkronisasi Smartsheet.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = pms.map(p => `
+          <tr class="hover:bg-slate-50/70 transition">
+            <td class="p-3 font-mono font-bold text-deep-900">${p.fleetId}</td>
+            <td class="p-3 font-medium text-deep-900">${p.pekerjaan}</td>
+            <td class="p-3 font-mono font-bold text-brand-700">${p.rhCurrent ?? '-'} Jam</td>
+            <td class="p-3 text-slate-600">${p.intervalType || '-'}${p.intervalRh ? ` (${p.intervalRh} RH)` : ''}</td>
+            <td class="p-3 text-slate-500 font-mono">${p.tanggalJatuhTempo ? new Date(p.tanggalJatuhTempo).toLocaleDateString('id-ID') : '-'}</td>
+            <td class="p-3">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${p.status === 'DONE' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                ${p.status}
+              </span>
+            </td>
+          </tr>
+        `).join('');
+      } catch (e) {
+        console.error('Error loading PMS:', e);
+      }
+    }
+
+    // ================= GUIDE MATRIX & FLOW VISUALIZER =================
+    function renderGuideMatrix() {
+      // 1. Render 7 Steps
+      const stepsGrid = document.getElementById('flowStepsGrid');
+      stepsGrid.innerHTML = FLOW_STEPS_META.map(step => `
+        <button onclick="selectFlowStep(${step.id})" id="flowStepBtn-${step.id}" class="text-left p-3 rounded-xl border transition flex flex-col justify-between ${currentSelectedStep === step.id ? 'bg-brand-700 text-white shadow-card border-brand-800' : 'bg-slate-50 hover:bg-white text-deep-900 border-soft-border'}">
+          <div>
+            <div class="text-[10px] font-mono font-bold uppercase tracking-wider opacity-80 mb-1">${step.title}</div>
+            <div class="text-xs font-bold leading-snug truncate">${step.desc}</div>
+          </div>
+          <div class="mt-3 pt-2 border-t ${currentSelectedStep === step.id ? 'border-brand-600/60' : 'border-soft-border'} text-[10px] font-mono opacity-80">
+            ${step.roles.join(', ')}
+          </div>
+        </button>
+      `).join('');
+
+      // 2. Render Matrix Table
+      const tbody = document.getElementById('matrixBody');
+      let rows = '';
+      Object.entries(TRANSITIONS).forEach(([from, targets]) => {
+        const entries = Object.entries(targets);
+        if (entries.length === 0) return;
+        entries.forEach(([to, roles]) => {
+          const gate = GATE_NOTES[`${from}->${to}`] || '-';
+          rows += `
+            <tr class="hover:bg-slate-50/70 transition">
+              <td class="py-2.5 px-3 text-slate-700 font-medium whitespace-nowrap">${STATUS_LABEL[from] || from}</td>
+              <td class="py-2.5 px-3 whitespace-nowrap">
+                <span class="text-[10px] px-2 py-0.5 rounded font-bold ${statusBadge(to)}">${STATUS_LABEL[to] || to}</span>
+              </td>
+              <td class="py-2.5 px-3"><div class="flex flex-wrap gap-1">${roles.map(r => roleChip(r)).join('')}</div></td>
+              <td class="py-2.5 px-3 text-[11px] text-slate-600">${gate}</td>
+            </tr>
+          `;
+        });
+      });
+      tbody.innerHTML = rows;
+    }
+
+    function selectFlowStep(stepId) {
+      currentSelectedStep = stepId;
+      document.querySelectorAll('[id^="flowStepBtn-"]').forEach(b => {
+        b.className = 'text-left p-3 rounded-xl border border-soft-border transition flex flex-col justify-between bg-slate-50 hover:bg-white text-deep-900';
+      });
+      const activeBtn = document.getElementById(`flowStepBtn-${stepId}`);
+      if (activeBtn) {
+        activeBtn.className = 'text-left p-3 rounded-xl border border-brand-800 transition flex flex-col justify-between bg-brand-700 text-white shadow-card';
+      }
+
+      const meta = FLOW_STEPS_META.find(s => s.id === stepId);
+      if (!meta) return;
+
+      const detail = document.getElementById('stepDetailBox');
+      detail.innerHTML = `
+        <div class="flex items-center justify-between">
+          <span class="font-bold text-deep-900 text-sm flex items-center space-x-2">
+            <span class="w-6 h-6 rounded-full bg-brand-700 text-white flex items-center justify-center text-xs font-mono">${meta.id}</span>
+            <span>Rincian SOP: ${meta.title}</span>
+          </span>
+          <span class="font-mono text-[10px] font-bold px-2 py-0.5 bg-white rounded border border-brand-200 text-brand-800">${meta.status}</span>
+        </div>
+        <p class="text-slate-700 leading-relaxed">${meta.desc}</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 pt-2 border-t border-brand-200">
+          <div><strong class="text-slate-800">Peran Bertanggung Jawab:</strong> <span class="text-brand-900 font-semibold">${meta.roles.join(', ')}</span></div>
+          <div><strong class="text-slate-800">Ketentuan Pintu Gerbang (Gate Rule):</strong> <span class="text-slate-700">${meta.gate}</span></div>
+        </div>
+      `;
+    }
+
+    function populateFleetSelect() {
+      const sel = document.getElementById('inputFleetId');
+      if (!sel) return;
+      sel.innerHTML = fleets.map(f => `<option value="${f.id}">${f.name} (${f.id})</option>`).join('') || '<option value="">- Sinkronkan data terlebih dahulu -</option>';
+    }
+
+    // ================= APP INITIALIZATION =================
+    window.addEventListener('DOMContentLoaded', () => {
+      renderTabbar();
+      switchRole('JR_TS');
+      loadAll();
+      renderGuideMatrix();
+      selectFlowStep(1);
+    });
+  </script>
+</body>
+</html>

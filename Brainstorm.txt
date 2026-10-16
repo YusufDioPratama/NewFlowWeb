@@ -1,0 +1,27 @@
+Yang merah
+Keseluruhan data di pegang oma
+Boleh di tambah asal approval oma
+Equipment list terhubung ke part list 1
+
+Role 
+oma/admin (bisa keseluruhan) 
+Oma 2/admin 2
+Jr ts 2
+Sr ts 2
+Regional 2
+Mrp 1
+Workshop 1
+ 
+Data berjalan hanya noon report (di smartsheet) 
+Di fleet dwg, equip ment list, setifikat ada upload dokumen
+ Page pms rh(runing hour) 
+
+Defect list masuk audit, pms, cap, unplaned breakdown
+
+dari flow keseluruhan tiap order ke tracking sudah sampai di proses mana agar terlihat pending/stuck diproses apa
+berita acara serah terima/selesai pekerjaan
+
+
+role oma/admin ini bisa membuka keseluruhan flow 
+untuk role lain sesuaikan dengan ERD dan source lainnya
+untuk database excel itu banyak irisan/key yang bersinggungan/berhubungan

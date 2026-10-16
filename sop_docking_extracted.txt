@@ -1,0 +1,248 @@
+PROSEDUR DOCKING KAPAL
+(B.TMT.5.4.01-TF)
+LEMBAR PENGESAHAN DAN REGISTRASI DOKUMEN TERKENDALI
+URAIAN
+JABATAN
+TANDA TANGAN
+Diberlakukan
+Direktur Teknik
+Disetujui
+Group Head Optimasi Manajemen Armada
+Diperiksa
+Designated Person Ashore (DPA)
+Management Representative
+Disusun
+Group Head Kualitas dan Proses Bisnis
+Diusul
+Dept. Head Optimasi Keandalan Armada dan Fasilitas
+Catatan Revisi
+Rev
+Deskripsi Revisi/Alasan Perubahan
+Pengusul
+Tanggal
+Notasi Prosedur
+No
+Notasi
+Keterangan
+1
+375947115128Mulai00Mulai
+Mulai
+Mulai
+Mendeskripsikan dimulainya pekerjaan
+2
+375948101766Selesai00Selesai
+Selesai
+Selesai
+Mendeskripsikan berakhirnya pekerjaan
+3
+3756297239000
+Mendeskripsikan proses dari sebuah pekerjaan
+4
+4236558459300
+Mendeskripsikan input atau output dokumen pada proses
+5
+36799610049600
+Mendeskripsikan dokumen prosedur yang menjadi referensi pekerjaan pada prosedur
+6
+3924968191500
+Mendeskripsikan pengambilan keputusan atau pilihan yang ada pada proses
+7
+42324125366900
+Mendeskripsikan penghubung antar proses
+8
+Mendeskripsikan penghubung proses pada halaman atau lembar yang sama, dengan angka yang sesuai dengan urutan penyambungan proses
+9
+53239959067A00A531495-4797291001
+A
+A
+1
+1
+Mendeskripsikan penghubung proses pada halaman atau lembar yang berbeda, dengan huruf abjad yang sesuai dengan urutan penyambungan proses
+10
+51649998474
+Mendeskripsikan sistem informasi atau tools pendukung pelaksanaan pekerjaan proses bisnis
+TUJUAN
+Prosedur bertujuan untuk memberikan tata cara terkait tahapan dalam proses perawatan tahunan (docking) secara berencana dan tepat waktu sesuai jadwal yang telah ditetapkan, sehingga secara teknis kapal dapat terpelihara dengan pemenuhan aturan yang dipersyaratkan oleh Pemerintah dan Biro Klasifikasi, guna menjamin kelaikan kapal dan keselamatan terhadap penumpang, barang, dan kapal itu sendiri.
+RUANG LINGKUP
+Prosedur ini berada di bawah lingkup Divisi Optimasi Manajemen Armada, khususnya pada Sub Divisi Optimasi Keandalan Armada dan Fasilitas;
+Prosedur ini berlaku di lingkungan PT ASDP Indonesia Ferry (Persero);
+Prosedur ini meliputi tahapan penyusunan program dan usulan pekerjaan, evaluasi serta persetujuan biaya dan jadwal, pengadaan, pelaksanaan oleh galangan maupun swakelola awak kapal, pengawasan teknis dan K3, penanganan pekerjaan tambahan melalui analisis dan adendum kontrak, serta evaluasi hasil docking yang dilaporkan ke manajemen pusat untuk perbaikan berkelanjutan;
+Proses pada prosedur ini masuk ke dalam kategori pengelolaan maintenance facilities.
+ACUAN
+ISM Code – Element: 10. Maintenance of the Ship and Equipment;
+SOLAS 1974 – Regulation II-1/6 (Inspection and Certification);
+MARPOL 73/78 – Regulation 13 (Survey and Certification of Ship's Pollution Prevention Equipment);
+Undang-Undang (UU) Nomor 17 Tahun 2008 tentang Pelayaran;
+Peraturan Pemerintah (PP) Nomor 20 Tahun 2010 tentang Angkutan di Perairan;
+Peraturan Menteri Perhubungan Nomor PM 56 Tahun 2018 tentang Keselamatan Pelayaran;
+Peraturan Menteri Perhubungan Nomor PM 51 Tahun 2017 tentang Perawatan dan Pemeliharaan Kapal;
+Keputusan Direksi PT ASDP Indonesia Ferry (Persero) Nomor: KD.225/HK.002/ASDP-2024 tanggal 18 November 2024 tentang Bidang Sumber Daya Manusia di Lingkungan PT ASDP Indonesia Ferry (Persero) juncto KD.95/HK.002/JKTHS/VI/ASDP-2025 tanggal 20 Juni 2025;
+Keputusan Direksi PT ASDP Indonesia Ferry (Persero) tentang Penerapan Sistem Manajemen Terpadu di Lingkungan PT ASDP Indonesia Ferry (Persero);
+Surat Keputusan Direksi PT ASDP Indonesia Ferry (Persero) Nomor: SK.488/PA.005/ASDP-2021 tanggal 26 Juli 2021 tentang Penetapan Uraian Jabatan Organisasi dan Tata Kerja Kantor Pusat dan Regional PT ASDP Indonesia Ferry (Persero).
+DEFINISI
+Biaya kumulatif pekerjaan docking adalah biaya yang timbul akibat pekerjaan dalam rangka docking yang menjadi beban Mata Anggaran Kapal Ro-Ro/Penyeberangan termasuk di dalamnya biaya tambahan pekerjaan docking;
+Docking adalah suatu atau segala pekerjaan/perawatan/perbaikan/reparasi kapal yang dilakukan di galangan kapal dengan jenis-jenis pekerjaan tertentu secara rutin, teratur, dan terencana;
+Emergency docking adalah docking yang dilaksanakan akibat adanya kerusakan kapal yang tidak dapat diperbaiki di lintasan;
+Owner matter adalah pengambilan keputusan yang diambil bukan berdasarkan aspek keselamatan dan pemenuhan persyaratan regulasi, melainkan berdasarkan kebijakan pemilik kapal;
+Running repair adalah pekerjaan perawatan bagian infrastruktur dan fasilitas kapal yang dilakukan di lintasan tanpa mengganggu jadwal operasional kapal;
+Swakelola adalah kegiatan perawatan dalam rangka docking pada departemen deck dan mesin kapal yang direncanakan, dikerjakan, dan diawasi sendiri oleh penanggung jawab dan koordinator;
+Waktu pelaksanaan docking adalah rangkaian waktu mulai dari kapal keluar lintasan untuk melaksanakan docking hingga kapal tiba kembali di lintasan setelah melaksanakan docking;
+Hari Docking adalah lama waktu pelaksanaan docking mulai kapal tiba di galangan hingga kapal kembali ke lintasan.
+URAIAN PERAN
+Direktur Teknik
+Memberikan arahan penyusunan program docking kapal kepada Executive Director; menyetujui pekerjaan tambahan docking yang melampaui batas kewenangan Executive Director, serta menerima laporan realisasi penggunaan anggaran docking dan laporan pelaksanaan emergency docking.
+Group Head Optimasi Manajemen Armada
+Menerima Usulan RKA Docking Kapal dari Executive Director; melakukan reviu dan persetujuan atas RKA Docking sehingga dihasilkan RKA Docking Kapal dan Daftar Pekerjaan Docking yang telah disetujui; melakukan reviu atas evaluasi Usulan Persetujuan Pekerjaan Tambahan Docking yang diajukan oleh Executive Director; menerima laporan hasil pelaksanaan docking dan laporan emergency docking; serta memastikan adanya sentralisasi database laporan pelaksanaan docking di tingkat perusahaan.
+Executive Director
+Mengelola dan mengoordinasikan penyusunan program docking kapal bersama Technical Superintendent dan Dept. Head Operasional dan Teknik Armada Regional; menyampaikan Usulan RKA Docking Kapal kepada Group Head Optimasi Manajemen Armada; menerbitkan Perjanjian Pekerjaan Docking dan Surat Perintah Kerja (SPK) Swakelolasebelum pelaksanaan docking; menginstruksikan pembuatan Surat Permintaan Pengadaan Barang/Jasa Pekerjaan Tambahan Docking apabila pekerjaan tambahan masih dalam batas kewenangannya; menyampaikan Usulan Persetujuan Pekerjaan Tambahan Docking kepada Direktur Teknik apabila pekerjaan tambahan melampaui batas kewenangannya; menerbitkan surat Perjanjian Tambahan Pekerjaan Docking; memastikan jangka waktu Perjanjian Docking dan/atau Perjanjian Tambahan Docking tidak jatuh tempo selama pekerjaan docking berlangsung; serta melaporkan realisasi penggunaan anggaran pelaksanaan docking kepada Direktur Teknik selambat-lambatnya 5 hari setelah selesai masa jaminan pemeliharaan kapal.
+Dept. Head Optimasi Keandalan Armada dan Fasilitas
+Melakukan reviu dan penyesuaian harga atas Usulan RKA Docking; serta melakukan evaluasi atas Usulan Persetujuan Pekerjaan Tambahan Docking dengan mempertimbangkan skala prioritas anggaran.
+Dept. Head Operasional dan Teknik Armada Regional
+Menyusun RKA atas Daftar Rencana Pekerjaan Docking; berkoordinasi dengan pihak galangan untuk menentukan tanggal dockspace; mengikuti joint survey bersama Technical Superintendent, pihak kapal, pihak galangan, dan/atau pihak klasifikasi; menyusun dan melakukan estimasi anggaran atas Formulir Daftar Pekerjaan Docking untuk memastikan biaya tidak melebihi RKA Docking, dan apabila biaya melebihi RKA Docking, mengajukan permohonan evaluasi Daftar Pekerjaan Docking kepada Sr. Technical Superintendent; melakukan finalisasi Daftar Usulan Pekerjaan Docking asebelum pelaksanaan docking; menyusun anggaran atas Daftar Pekerjaan Tambahan Docking dengan mengacu pada ketersediaan anggaran docking; serta membuat SP2BJ Pekerjaan Docking maupun SP2BJ Pekerjaan Tambahan Docking berdasarkan kewajaran harga untuk disampaikan kepada fungsi Manajemen Rantai Pasok Regional.
+Sr. Technical Superintendent
+Melakukan reviu atas Daftar Rencana Pekerjaan Docking dengan mempertimbangkan strategi keandalan armada; memberikan arahan kepada Technical Superintendent untuk melakukan joint survey selambat-lambatnya 6 bulan sebelum pelaksanaan docking; melakukan reviu dan finalisasi atas Formulir Daftar Pekerjaan Docking; melakukan penyesuaian Daftar Pekerjaan Docking berdasarkan prioritas pekerjaan dengan mengacu pada RKA Docking apabila biaya melebihi RKA Docking; bersama Technical Superintendent memilah pekerjaan docking yang telah disetujui dan dapat dikerjakan di lintasan sebelum kapal melaksanakan docking; serta menyetujui permohonan pekerjaan tambahan docking dari Technical Superintendent.
+Technical Superintendent
+Menyusun Daftar Rencana Pekerjaan Docking; melaksanakan joint survey bersama pihak kapal, Dept. Head Operasional dan Teknik Armada Regional, pihak galangan, dan/atau pihak klasifikasi; menyusun Daftar Pekerjaan Docking berdasarkan hasil joint survey dan menyampaikannya kepada Sr. Technical Superintendent sebelum pelaksanaan docking; melakukan monitoring kesiapan administrasi dan material penunjang pelaksanaan docking; melakukan final checklist persiapan pelaksanaan docking maksimal 3 hari sebelum pelaksanaan docking; memastikan pelaksanaan docking sesuai rencana sehingga target hari docking tercapai; melaksanakan pengawasan docking sesuai Perjanjian Pekerjaan Docking dan Surat Perintah Kerja (SPK) Swakelola, termasuk arrival meeting dan koordinasi dengan Tim K3 Galangan; memeriksa kondisi kapal serta mendampingi pelaksanaan survei oleh Biro Klasifikasi dan Kesyahbandaran; melakukan analisis dan evaluasi untuk menetapkan pekerjaan tambahan docking, kemudian menyampaikan permohonan tambahan pekerjaan docking asetelah pelaksanaan survei tersebut; serta melaporkan hasil pelaksanaan docking beserta rekomendasi kepada Group Head Optimasi Manajemen Armada setelah kapal kembali ke lintasan.
+RINCIAN PROSEDUR
+Aktor
+Perencanaan Anggaran Docking
+Direktur Teknik memberi arahan penyusunan program docking kapal kepada Executive Director.
+Direktur Teknik
+Executive Director mengelola dan mengoordinasikan penyusunan program docking kapal bersama Technical Superintendent dan Dept. Head Operasional dan Teknik Regional.
+Executive Director
+Technical Superintendent menyusun Daftar Rencana Pekerjaan Docking, kemudian menyampaikan kepada Dept. Head Operasional dan Teknik Regional.
+Technical Superintendent
+Dept. Head Operasional dan Teknik Regional kemudian menyusun dan melakukan estimasi harga RKA atas Daftar Rencana Pekerjaan Docking untuk selanjutnya disampaikan ke Executive Director.
+Dept. Head Operasional dan Teknik Regional
+Executive Director menyampaikan Usulan RKA Docking Kapal kepada Group Head Optimasi Manajemen Armada.
+Executive Director
+Sr. Technical Superintendent melakukan reviu atas Daftar Rencana Pekerjaan Docking dengan mempertimbangkan strategi keandalan armada.
+Sr. Technical Superintendent
+Dept. Head Optimasi Keandalan Armada dan Fasilitas melakukan reviu dan estimasi atas harga Usulan RKA Docking berdasarkan realiasai docking tahun sebelumnya.
+Dept. Head Optimasi Keandalan Armada dan Fasilitas
+Group Head Optimasi Manajemen Armada melakukan reviu dan persetujuan atas RKA Docking, menghasilkan RKA Docking Kapal dan Daftar Pekerjaan Docking yang telah disetujui.
+Group Head Optimasi Manajemen Armada
+C
+Persetujuan Docking
+Dept. Head Operasional dan Teknik Regional berkoordinasi dengan pihak galangan untuk menentukan tanggal dockspace.
+Dept. Head Operasional dan Teknik Regional
+Sr. Technical Superintendent memberikan arahan kepada Technical Superintendent untuk melakukan joint survey kapal selambat-lambatnya 6 bulan sebelum pelaksanaan docking.
+Sr. Technical Superintendent
+Technical Superintendent melaksanakan joint survey ke kapal bersama pihak kapal, Dept. Head Operasional dan Teknik Regional, pihak galangan, dan/atau pihak klasifikasi guna menetapkan kuantitas dan prioritas pekerjaan mengacu pada persyaratan kelaiklautan dan keselamatan kapal yang dibuktikan dengan Berita Acara.
+Technical Superintendent
+Technical Superintendent menyusun Daftar Pekerjaan Docking (work order) berdasarkan hasil joint survey dan item defect list yang ada di kapal dengan tetap memperhatikan klasifikasi pekerjaan (Class Matter, Safety Matter dan Owner Matter) serta segmentasi pekerjaan (running repair dan docking repair) dan menyampaikannya kepada Sr. Technical Superintendent selambat-lambatnya 5 bulan sebelum pelaksanaan docking.
+Technical Superintendent
+Sr. Technical Superintendent melakukan reviu dan finalisasi atas Formulir Daftar Pekerjaan Docking dan kemudian disampaikan kepada Dept. Head Operasional dan Teknik Regional.
+Sr. Technical Superintendent
+Dept. Head Operasional dan Teknik Regional melakukan estimasi harga dan menyusun anggaran terhadap Formulir Daftar Pekerjaan Docking berdasarkan penawaran harga dan realisasi biaya pekerjaan sebelumnya untuk memastikan biaya pekerjaan docking tidak melebihi RKA Docking.
+Apabila biaya pekerjaan docking melebihi RKA Docking, maka proses dilanjutkan dengan:
+Dept. Head Operasional dan Teknik Regional
+Dept. Head Operasional dan Teknik Regional melakukan evaluasi item pekerjaan berdasarkan klasifikasi pekerjaan dan segmentasi pekerjaan. Dept. Head Operasional dan Teknik Regional akan mengeleminasi item pekerjaan yang selanjutnya akan dimasukkan ke dalam  work order rutin sesuai dengan prosedur Inspeksi dan pemeliharaan rutin.
+Dept. Head Operasional dan Teknik Regional
+Dept. Head Operasional dan Teknik Regional melakukan finalisasi atas Daftar Usulan Pekerjaan Docking selambat-lambatnya 2 bulan sebelum pelaksanaan docking.
+Dept. Head Operasional dan Teknik Regional
+Persiapan Pelaksanaan Docking
+Technical Superintendent melakukan monitoring terhadap kesiapan administrasi dan material penunjang pelaksanaan docking.
+Technical Superintendent
+Dept. Head Operasional dan Teknik Regional membuat SP2BJ Pekerjaan Docking, untuk selanjutnya disampaikan kepada fungsi Manajemen Rantai Pasok di Regional.
+Proses Pengadaan oleh Fungsi Manajemen Rantai Pasok Regional sesuai dengan Prosedur Pengadaan Barang dan Jasa
+Dept. Head Operasional dan Teknik Regional
+Executive Director menerbitkan surat Perjanjian Pekerjaan Docking selambat-lambatnya 1 bulan sebelum pelaksanaan docking.
+Executive Director
+Pelaksanaan penerbitan Surat Perintah Kerja (SPK) Swakelola sesuai dengan KD Swakelola yang berlaku di lingkungan Perusahaan selambat-lambatnya 1 bulan sebelum pelaksanaan docking.
+General Manager/Executive Director
+Technical Superintendent melakukan final checklist persiapan pelaksanaan docking maksimal 3 hari sebelum pelaksanaan docking.
+Technical Superintendent
+Pelaksanaan Docking
+Pelaksanaan pekerjaan running repair dilaksanakan oleh penyedia jasa yang telah ditunjuk untuk melaksanakan pekerjaan running repair sebelum kapal berangkat ke galangan untuk melaksanakan docking.
+Penyedia Jasa
+Pekerjaan pengedokan dilaksanakan oleh galangan sesuai perjanjian pekerjaan docking yang telah dibuat.
+Galangan
+Awak Kapal melaksanakan pekerjaan swakelola bagian deck dan mesin berdasarkan Surat Perintah Kerja (SPK) Swakelola.
+Awak Kapal
+Technical Superintendent memastikan pelaksanaan docking sesuai rencana sehingga target hari docking kapal tercapai.
+Technical Superintendent
+Pengawasan Pelaksanaan Docking
+Technical Superintendent melaksanakan pengawasan docking sesuai surat Perjanjian Pekerjaan Docking dan Surat Perintah Kerja (SPK) Swakelola.
+Technical Superintendent
+Technical Superintendent melakukan arrival meeting serta berkoordinasi dengan Tim K3 Galangan selama pelaksanaan docking berjalan agar tetap mengikuti prinsip keselamatan dan kesehatan kerja (K3) dengan memperhatikan Prosedur Keselamatan dan Kesehatan Kerja.
+Technical Superintendent
+Pekerjaan Tambahan Docking
+Technical Superintendent memeriksa kondisi kapal secara langsung dengan mengacu pada Perjanjian Pekerjaan Docking dan kondisi aktual kapal.
+Technical Superintendent
+Technical Superintendent melakukan koordinasi dan pendampingan pelaksanaan survei oleh Biro Klasifikasi dan Kesyahbandaran.
+Technical Superintendent
+Technical Superintendent menindaklanjuti hasil pelaksanaan sesuai dengan butir 6.6.1 dan 6.6.2:
+Bila terdapat pekerjaan yang belum terakomodasi dalam Kontrak Induk dan/atau terdapat kondisi kapal yang tidak sesuai dengan Kontrak Induk dan/atau Kerangka Acuan Kerja, maka Technical Superintendent melakukan analisis dan evaluasi untuk menetapkan pekerjaan tambahan dengan skala prioritas pemenuhan persyaratan kelaikan dan keselamatan. Dalam proses analisis dan evaluasi tersebut, bila dipandang perlu, Technical Superintendent dapat melakukan reviu dan penyesuaian terhadap pekerjaan pada Kontrak Induk yang bersifat owner matter.
+Bila sesuai, maka dilanjutkan ke proses 6.6.10.
+Technical Superintendent
+Technical Superintendent menyampaikan permohonan tambahan pekerjaan docking yang telah disetujui oleh Sr. Technical Superintendent kepada Dept. Head Operasional dan Teknik Regional selambat-lambatnya 1 hari setelah pelaksanaan survei oleh Biro Klasifikasi dan/atau Kesyahbandaran, dengan melampirkan Daftar Pekerjaan Tambahan Docking.
+Technical Superintendent
+Dept. Head Operasional dan Teknik Regional melakukan penyusunan dan estimasi anggaran atas Daftar Pekerjaan Tambahan Docking dengan mengacu pada ketersediaan anggaran docking.
+Catatan:
+Jika Pekerjaan Tambahan Docking tidak melebihi 10% Perjanjian Induk dan jumlah kumulatif seluruh pekerjaan terkait Docking tidak melebihi anggaran docking yang tersedia, maka Executive Director dapat langsung menginstruksikan Dept. Head Operasional dan Teknik Regional untuk membuat Surat Permintaan Pengadaan Barang/Jasa Pekerjaan Tambahan Docking.
+Jika Pekerjaan Tambahan Docking melebihi 10% Perjanjian Induk namun jumlah kumulatif seluruh pekerjaan terkait Docking tidak melebihi anggaran docking yang tersedia, maka Executive Director dapat langsung menginstruksikan Dept. Head Operasional dan Teknik Regional untuk membuat Surat Permintaan Pengadaan Barang/Jasa Pekerjaan Tambahan Docking.
+Jika Pekerjaan Tambahan Docking melebihi 10% Perjanjian Induk dan jumlah kumulatif seluruh pekerjaan terkait Docking melebihi anggaran docking yang tersedia maka Executive Director mengajukan kepada Direktur Teknik untuk mendapat persetujuan.
+Dept. Head Operasional dan Teknik Regional
+Executive Director menyampaikan Usulan Persetujuan Pekerjaan Tambahan Docking dengan dilengkapi dokumen pendukung kepada Direktur Teknik selambat-lambatnya 1 hari setelah pelaksanaan survei oleh Biro Klasifikasi dan/atau Kesyahbandaran.
+Executive Director
+Dept. Head Optimasi Keandalan Armada dan Fasilitas melakukan evaluasi atas Usulan Persetujuan Pekerjaan Tambahan Docking dengan mempertimbangkan skala prioritas anggaran.
+Dept. Head Optimasi Keandalan Armada dan Fasilitas
+Group Head Optimasi Manajemen Armada melakukan reviu atas Evaluasi Usulan Persetujuan Pekerjaan Tambahan Docking yang diajukan oleh Executive Director.
+Group Head Optimasi Manajemen Armada
+Direktur Teknik memberikan persetujuan pekerjaan tambahan docking selambat-lambatnya 2 (dua) hari setelah menerima permohonan persetujuan dari Executive Director.
+Direktur Teknik
+Dept. Head Operasional dan Teknik Regional membuat SP2BJ Pekerjaan Tambahan Docking, untuk selanjutnya disampaikan kepada fungsi Manajemen Rantai Pasok di Regional.
+Proses Pengadaan oleh Fungsi Manajemen Rantai Pasok Regional sesuai dengan Prosedur Pengadaan Barang dan Jasa.
+Dept. Head Operasional dan Teknik Regional
+Executive Director menerbitkan surat Perjanjian Tambahan Pekerjaan Docking.
+Executive Director
+Executive Director memastikan selama pekerjaan docking berlangsung, jangka waktu pada Perjanjian Docking dan/atau Perjanjian Tambahan Docking tidak jatuh tempo sehingga hak dan kewajiban para pihak tetap terlindungi.
+Executive Director
+Evaluasi Pelaksanaan Docking
+Technical Superintendent melaporkan hasil pelaksanaan docking serta rekomendasi untuk pelaksanaan docking selanjutnya kepada Group Head Optimasi Manajemen Armada selambat-lambatnya 5 hari kerja setelah kapal kembali ke lintasan. Adapun laporan docking berisi setidaknya:
+Evaluasi kualitas dan kinerja galangan dan/atau penyedia barang/jasa
+Laporan pelaksanaan docking
+Penilaian kondisi kapal pasca docking
+Laporan keterlambatan pelaksanaan hari docking (jika terjadi)
+Dokumen pendukung selama masa pelaksanaan docking
+Technical Superintendent
+Executive Director melaporkan realisasi penggunaan anggaran pelaksanaan docking kepada Direktur Teknik selambat-lambatnya 5 hari setelah selesai masa jaminan pemeliharaan kapal.
+Executive Director
+Group Head Optimasi Manajemen Armada memastikan sentralisasi database laporan pelaksanaan docking.
+Group Head Optimasi Manajemen Armada
+Emergency Docking
+Setiap terjadi ketidaksesuaian atau kejadian force majeure yang mengharuskan emergency docking, penanganannya dilakukan sesuai dengan prosedur Ketidaksesuaian, Tindakan Perbaikan dan Pencegahan Keselamatan, Kesehatan, dan Lingkungan (TS-118) serta dilaporkan kepada Group Head Optimasi Manajemen Armada dan Direktur Teknik. Setelah pelaksanaan emergency docking, kegiatan dilanjutkan ke proses 6.8.1.
+INDIKATOR DAN UKURAN KEBERHASILAN
+Rata-rata hari docking sesuai dengan target yang telah ditetapkan perusahaan dan biaya docking terkendali sesuai perencanaan.
+Penyusunan draf persetujuan docking oleh Dept. Head Operasional dan Teknik Regional terselesaikan maksimal 2 (dua) bulan sebelum jadwal pelaksanaan docking.
+Penyusunan perjanjian pekerjaan docking oleh General Manager terselesaikan maksimal 1 (satu) bulan sebelum jadwal pelaksanaan docking.
+Persetujuan pekerjaan tambahan docking oleh Direktur Teknik terselesaikan maksimal 3 (tiga) hari kerja setelah permohonan diterima.
+Penyusunan resume laporan pelaksanaan docking tiap kapal oleh Technical Superintendent terselesaikan maksimal 5 (lima) hari kerja setelah kapal kembali ke lintasan.
+LAMPIRAN
+Formulir Daftar Pekerjaan Docking
+(B.TMT.5.4.01-TF.00.03)
+Formulir Daftar Pekerjaan Tambahan Docking
+(B.TMT.5.4.01-TF.00.04)
+Formulir Berita Acara Analisis dan Evaluasi Tambahan Docking
+(B.TMT.5.4.01-TF.00.05)
+Formulir Jadwal Pelaksanaan Pekerjaan Swakelola
+(B.TMT.5.4.01-TF.02.01)
+Formulir Jurnal Harian Pelaksanaan Docking
+(B.TMT.5.4.01-TF.02.03)
+Formulir Laporan Kondisi Mesin Saat Uji Coba Berlayar (Sea Trial)
+(B.TMT.5.4.01-TF.02.04)
+Formulir Laporan Pelaksanaan Docking
+(B.TMT.5.4.01-TF.02.05)
+Formulir Berita Acara Serah Terima
+(B.TMT.5.4.01-TF.02.06)
+Formulir Berita Acara Naik Dok
+(B.TMT.5.4.01-TF.02.07)
+Formulir Berita Acara Turun Dok
+(B.TMT.5.4.01-TF.02.08)
+Formulir Berita Acara Pemeriksaan Hasil Pekerjaan Docking
+(B.TMT.5.4.01-TF.02.09)
+Formulir Berita Acara Uji Coba Kapal (Sea Trial)
+(B.TMT.5.4.01-TF.02.10)
+Formulir Berita Acara Selesai Pekerjaan
+(B.TMT.5.4.01-TF.02.11)

@@ -1,0 +1,442 @@
+// ponytail: SQLite used for rapid local test without db server, swap provider to "postgresql" for production
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+}
+
+enum Role {
+  OMA_ADMIN
+  OMA_2
+  JR_TS
+  SR_TS
+  REGIONAL
+  MRP
+  WORKSHOP
+  KAPAL
+  KEUANGAN
+}
+
+// State machine aligned with ERD flow:
+// KAPAL/JR_TS input temuan -> DRAFT -> SUBMITTED_JR_TS -> APPROVED_SR_TS -> MRP_STOCK_CHECK
+// MRP branches: ALLOCATED_WORKSHOP (stock ada) | REGIONAL_COST_ESTIMATE -> REGIONAL_PR_PBJ (pengadaan)
+// -> EXECUTION -> WORK_COMPLETED -> BAST_SUBMITTED -> PAYMENT_PROCESSED -> COMPLETED
+enum OrderStatus {
+  DRAFT
+  SUBMITTED_JR_TS
+  APPROVED_SR_TS
+  MRP_STOCK_CHECK
+  ALLOCATED_WORKSHOP
+  REGIONAL_COST_ESTIMATE
+  REGIONAL_PR_PBJ
+  EXECUTION
+  WORK_COMPLETED
+  ADDENDUM_REQUESTED
+  ADDENDUM_APPROVED
+  BAST_SUBMITTED
+  PAYMENT_PROCESSED
+  COMPLETED
+  REJECTED
+}
+
+enum WorkSegmentation {
+  RUNNING_REPAIR
+  DOCKING
+  FLOATING
+  SWAKELOLA
+}
+
+enum PriorityLevel {
+  LOW
+  MEDIUM
+  HIGH
+  EMERGENCY
+}
+
+model User {
+  id        String     @id @default(uuid())
+  email     String     @unique
+  name      String
+  role      Role
+  auditLogs AuditLog[]
+  createdAt DateTime   @default(now())
+}
+
+model Fleet {
+  id             String      @id // Fleet ID e.g. "ACEH HEBAT 1", "KMP Kerapu"
+  name           String
+  email          String?
+  shipowner      String?
+  yob            Int?
+  paxCapacity    Int?
+  imoNo          String?
+  freeboard      String?
+  vesselType     String?
+  mmsi           String?
+  hullNo         String?
+  classNotation  String?
+  shipBuilder    String?
+  machineClass   String?
+  meCount        Int?
+  createdAt      DateTime    @default(now())
+
+  masters        DataMaster[]
+  rkas           Rka[]
+  equipments     Equipment[]
+  parts          Part[]
+  dwgs           FleetDwg[]
+  certs          FleetCert[]
+  anodes         Anode[]
+  pelumas        Pelumas[]
+  cats           Cat[]
+  alatKerja      AlatKerja[]
+  mobilisasi     Mobilisasi[]
+  fumigasi       Fumigasi[]
+  noonReports    NoonReport[]
+  auditNcs       AuditNC[]
+  pmsList        PMS[]
+  caps           CAP[]
+  breakdowns     UnplannedBreakdown[]
+  defects        DefectList[]
+  workOrders     WorkOrder[]
+  dockingOrders  DockingOrder[]
+}
+
+model DataMaster {
+  id          String   @id @default(uuid())
+  fleetId     String
+  namaMaster  String
+  fleet       Fleet    @relation(fields: [fleetId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+}
+
+model Rka {
+  id          String   @id @default(uuid())
+  fleetId     String
+  namaRka     String
+  rkaDocking  Float    @default(0)
+  rkaRutin    Float    @default(0)
+  fleet       Fleet    @relation(fields: [fleetId], references: [id], onDelete: Cascade)
+}
+
+model Pelumas {
+  id         String   @id @default(uuid())
+  fleetId    String
+  nama       String
+  hargaSatuan Float   @default(0)
+  fleet      Fleet    @relation(fields: [fleetId], references: [id], onDelete: Cascade)
+}
+
+model Cat {
+  id         String   @id @default(uuid())
+  fleetId    String
+  nama       String
+  hargaSatuan Float   @default(0)
+  fleet      Fleet    @relation(fields: [fleetId], references: [id], onDelete: Cascade)
+}
+
+model Anode {
+  id         String   @id @default(uuid())
+  fleetId    String
+  nama       String
+  hargaSatuan Float   @default(0)
+  fleet      Fleet    @relation(fields: [fleetId], references: [id], onDelete: Cascade)
+}
+
+model AlatKerja {
+  id         String   @id @default(uuid())
+  fleetId    String
+  nama       String
+  hargaSatuan Float   @default(0)
+  fleet      Fleet    @relation(fields: [fleetId], references: [id], onDelete: Cascade)
+}
+
+model Mobilisasi {
+  id         String   @id @default(uuid())
+  fleetId    String
+  nama       String
+  hargaSatuan Float   @default(0)
+  fleet      Fleet    @relation(fields: [fleetId], references: [id], onDelete: Cascade)
+}
+
+model Fumigasi {
+  id         String   @id @default(uuid())
+  fleetId    String
+  nama       String
+  hargaSatuan Float   @default(0)
+  fleet      Fleet    @relation(fields: [fleetId], references: [id], onDelete: Cascade)
+}
+
+model Equipment {
+  id           String      @id @default(uuid())
+  fleetId      String
+  nama         String
+  kategori     String?
+  manufacturer String?
+  modelType    String?
+  status       String?
+  serialNumber String?
+  stock        Int         @default(0)
+  hargaSatuan  Float       @default(0)
+  dokumenUrl   String?
+  fleet        Fleet       @relation(fields: [fleetId], references: [id], onDelete: Cascade)
+  parts        Part[]
+  pmsRecords   PMS[]
+  breakdowns   UnplannedBreakdown[]
+  caps         CAP[]
+}
+
+model Part {
+  id           String      @id @default(uuid())
+  fleetId      String
+  equipmentId  String
+  nama         String
+  kategori     String?
+  manufacturer String?
+  modelType    String?
+  status       String?
+  serialNumber String?
+  stock        Int         @default(0)
+  hargaSatuan  Float       @default(0)
+  fleet        Fleet       @relation(fields: [fleetId], references: [id], onDelete: Cascade)
+  equipment    Equipment   @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
+}
+
+model FleetDwg {
+  id          String   @id @default(uuid())
+  fleetId     String
+  namaDrawing String
+  hargaSatuan Float    @default(0)
+  dokumenUrl  String?
+  fleet       Fleet    @relation(fields: [fleetId], references: [id], onDelete: Cascade)
+}
+
+model FleetCert {
+  id          String   @id @default(uuid())
+  fleetId     String
+  namaCerti   String
+  hargaSatuan Float    @default(0)
+  dokumenUrl  String?
+  expiredDate DateTime?
+  fleet       Fleet    @relation(fields: [fleetId], references: [id], onDelete: Cascade)
+}
+
+model NoonReport {
+  id          String   @id @default(uuid())
+  fleetId     String
+  reportDate  DateTime
+  rhMesin     Float
+  keterangan  String?
+  fleet       Fleet    @relation(fields: [fleetId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+}
+
+model AuditNC {
+  id          String   @id @default(uuid())
+  fleetId     String
+  namaNc      String
+  klasifikasi String?
+  tanggalNc   DateTime
+  jatuhTempo  DateTime
+  fotoUrl     String?
+  status      String   @default("OPEN")
+  fleet       Fleet    @relation(fields: [fleetId], references: [id], onDelete: Cascade)
+  defects     DefectList[]
+}
+
+model PMS {
+  id             String    @id @default(uuid())
+  fleetId        String
+  equipmentId    String?
+  pekerjaan      String
+  intervalType   String?
+  intervalRh     Float?
+  rhCurrent      Float?
+  tanggalJatuhTempo DateTime?
+  status         String    @default("PENDING")
+  lastMaintDate  DateTime?
+  rhLastCheck    Float?
+  fleet          Fleet     @relation(fields: [fleetId], references: [id], onDelete: Cascade)
+  equipment      Equipment? @relation(fields: [equipmentId], references: [id])
+  defects        DefectList[]
+}
+
+model CAP {
+  id           String      @id @default(uuid())
+  fleetId      String
+  equipmentId  String?
+  uraian       String?
+  criteria     String?
+  itemInspeksi String?
+  temuan       String?
+  scoring      Float?
+  fotoUrl      String?
+  fleet        Fleet       @relation(fields: [fleetId], references: [id], onDelete: Cascade)
+  equipment    Equipment?  @relation(fields: [equipmentId], references: [id])
+  defects      DefectList[]
+}
+
+model UnplannedBreakdown {
+  id          String      @id @default(uuid())
+  fleetId     String
+  equipmentId String?
+  tglBreakdown DateTime
+  uraian      String
+  what        String?
+  why         String?
+  when        String?
+  where       String?
+  who         String?
+  how         String?
+  fleet       Fleet       @relation(fields: [fleetId], references: [id], onDelete: Cascade)
+  equipment   Equipment?  @relation(fields: [equipmentId], references: [id])
+  defects     DefectList[]
+}
+
+model DefectList {
+  id           String             @id @default(uuid())
+  fleetId      String
+  sumber       String?            // AUDIT_NC | PMS | CAP | UNPLANNED | RENCANA_DOCKING
+  auditNcId    String?
+  pmsId        String?
+  capId        String?
+  breakdownId  String?
+  priority     PriorityLevel      @default(MEDIUM)
+  kategori     String?
+  tanggalBuat  DateTime           @default(now())
+  dueDate      DateTime
+  dokumentasi  String?
+  deskripsi    String
+  segmentasi   WorkSegmentation   @default(RUNNING_REPAIR)
+  status       String             @default("OPEN")
+  fleet        Fleet              @relation(fields: [fleetId], references: [id], onDelete: Cascade)
+  auditNc      AuditNC?           @relation(fields: [auditNcId], references: [id])
+  pms          PMS?               @relation(fields: [pmsId], references: [id])
+  cap          CAP?               @relation(fields: [capId], references: [id])
+  breakdown    UnplannedBreakdown? @relation(fields: [breakdownId], references: [id])
+  workOrders   WorkOrder[]
+}
+
+model WorkOrder {
+  id           String             @id @default(uuid())
+  fleetId      String
+  defectId     String?
+  segmentasi   WorkSegmentation
+  pekerjaan    String
+  strategy     String?
+  deskripsi    String?
+  qty          Int                @default(1)
+  adaStock     Boolean            @default(false)
+  fotoUrl      String?
+  status       OrderStatus        @default(DRAFT)
+  currentRole  Role               @default(JR_TS)
+  fleet        Fleet              @relation(fields: [fleetId], references: [id], onDelete: Cascade)
+  defect       DefectList?        @relation(fields: [defectId], references: [id])
+  costEstimate CostEstimate?
+  tracking     OrderTracking[]
+  workshop     WorkshopTask?
+  dockingOrder DockingOrder?
+  bast         BASTRecord?
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+}
+
+model CostEstimate {
+  id          String    @id @default(uuid())
+  workOrderId String    @unique
+  totalRka    Float     @default(0)
+  hargaSatuan Float     @default(0)
+  totalBiaya  Float     @default(0)
+  prNumber    String?
+  pbjOffer    String?
+  workOrder   WorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+}
+
+model WorkshopTask {
+  id          String    @id @default(uuid())
+  workOrderId String    @unique
+  pekerjaan   String
+  status      String    @default("IN_PROGRESS")
+  workOrder   WorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+}
+
+model DockingOrder {
+  id           String            @id @default(uuid())
+  fleetId      String
+  workOrderId  String            @unique
+  targetDays   Int               @default(14)
+  actualDays   Int?
+  rkaPagu      Float             @default(0)
+  totalAddendum Float            @default(0)
+  status       OrderStatus       @default(EXECUTION)
+  fleet        Fleet             @relation(fields: [fleetId], references: [id], onDelete: Cascade)
+  workOrder    WorkOrder         @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  addendums    DockingAddendum[]
+  milestones   DockingMilestone[]
+}
+
+// SOP: Pekerjaan tambahan docking. >10% pagu RKA wajib persetujuan Dirtek/OMA
+model DockingAddendum {
+  id             String       @id @default(uuid())
+  dockingOrderId String
+  uraian         String
+  estimasiBiaya  Float
+  persentasePagu Float
+  needsDirtek    Boolean      @default(false)
+  approved       Boolean      @default(false)
+  rejected       Boolean      @default(false)
+  approvedBy     String?
+  dockingOrder   DockingOrder @relation(fields: [dockingOrderId], references: [id], onDelete: Cascade)
+  createdAt      DateTime     @default(now())
+}
+
+// Formulir BA SOP: Joint Survey, Naik Dok, Turun Dok, Sea Trial
+model DockingMilestone {
+  id             String       @id @default(uuid())
+  dockingOrderId String
+  tipeBa         String       // JOINT_SURVEY | NAIK_DOK | TURUN_DOK | SEA_TRIAL
+  tanggal        DateTime
+  dokumenBaUrl   String?
+  isVerified     Boolean      @default(false)
+  dockingOrder   DockingOrder @relation(fields: [dockingOrderId], references: [id], onDelete: Cascade)
+}
+
+// BAST generik per Work Order (Docking / Running Repair / Floating / Swakelola)
+model BASTRecord {
+  id             String    @id @default(uuid())
+  workOrderId    String    @unique
+  bastDate       DateTime  @default(now())
+  dokumenBastUrl String?
+  fotoUrl        String?
+  perfScoreGalangan Float?
+  catatan        String?
+  keuanganStatus String    @default("PENDING_PAYMENT")
+  workOrder      WorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+}
+
+model OrderTracking {
+  id          String      @id @default(uuid())
+  workOrderId String
+  fromStatus  OrderStatus
+  toStatus    OrderStatus
+  actorRole   Role
+  actorId     String
+  notes       String?
+  timestamp   DateTime    @default(now())
+  workOrder   WorkOrder   @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String
+  action    String
+  tableName String
+  recordId  String
+  payload   String?
+  timestamp DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
