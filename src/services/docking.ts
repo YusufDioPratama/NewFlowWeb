@@ -146,7 +146,7 @@ export class DockingService {
     if (addendum.dockingOrder.workOrder.status !== OrderStatus.ADDENDUM_REQUESTED) {
       throw new Error('Order tidak dalam status menunggu keputusan addendum');
     }
-    if (!ADMIN_ROLES.includes(input.actorRole) && ![Role.SR_TS, Role.REGIONAL].includes(input.actorRole)) {
+    if (!ADMIN_ROLES.includes(input.actorRole) && !([Role.SR_TS, Role.REGIONAL] as Role[]).includes(input.actorRole)) {
       throw new Error(`Role ${input.actorRole} tidak berhak menolak addendum`);
     }
 
@@ -182,7 +182,7 @@ export class DockingService {
     if (!allowedStatuses.includes(dockingOrder.workOrder.status)) {
       throw new Error('Milestone Berita Acara hanya dapat dicatat selama masa pelaksanaan docking');
     }
-    if (!ADMIN_ROLES.includes(input.actorRole) && ![Role.JR_TS, Role.SR_TS].includes(input.actorRole)) {
+    if (!ADMIN_ROLES.includes(input.actorRole) && !([Role.JR_TS, Role.SR_TS] as Role[]).includes(input.actorRole)) {
       throw new Error(`Role ${input.actorRole} tidak berhak mencatat milestone BA docking`);
     }
 

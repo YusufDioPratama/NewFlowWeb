@@ -230,7 +230,7 @@ app.post('/api/orders/:id/transition', async (req: Request, res: Response) => {
     }
 
     const updated = await workflowService.transitionOrder({
-      workOrderId: req.params.id,
+      workOrderId: req.params.id as string,
       actorId,
       actorRole,
       toStatus,
@@ -268,7 +268,7 @@ app.post('/api/docking/addendum/:id/approve', async (req: Request, res: Response
   try {
     const { actorRole, actorId } = getActorContext(req);
     const updated = await dockingService.approveAddendum({
-      addendumId: req.params.id,
+      addendumId: req.params.id as string,
       actorId,
       actorRole,
       catatan: req.body?.catatan
@@ -284,7 +284,7 @@ app.post('/api/docking/addendum/:id/reject', async (req: Request, res: Response)
   try {
     const { actorRole, actorId } = getActorContext(req);
     const updated = await dockingService.rejectAddendum({
-      addendumId: req.params.id,
+      addendumId: req.params.id as string,
       actorId,
       actorRole,
       catatan: req.body?.catatan
@@ -322,7 +322,7 @@ app.post('/api/orders/:id/bast', async (req: Request, res: Response) => {
     const { dokumenBastUrl, fotoUrl, perfScoreGalangan, catatan } = req.body;
 
     const bast = await dockingService.submitBast({
-      workOrderId: req.params.id,
+      workOrderId: req.params.id as string,
       dokumenBastUrl: dokumenBastUrl || '/uploads/bast_final.pdf',
       fotoUrl: fotoUrl || '/uploads/foto_selesai.jpg',
       perfScoreGalangan: parseFloat(perfScoreGalangan),
