@@ -378,3 +378,4 @@ if (!process.env.VERCEL) {
 }
 
 export { app, prisma };
+export default app;
